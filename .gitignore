@@ -1,0 +1,19 @@
+# Local datasets
+assignment-1/GarbageDataset/
+
+# macOS archive metadata
+__MACOSX/
+.DS_Store
+._*
+
+# Python environments and generated files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Local secrets
+.env
+.env.*
+!.env.example
