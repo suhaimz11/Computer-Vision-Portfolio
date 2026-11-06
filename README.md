@@ -1,33 +1,29 @@
 # Computer Vision Portfolio
 
-A collection of computer vision assignments, code, notebooks, and results.
+Computer vision assignments, implementation code, analysis, and results.
 
-## Project structure
+## Assignments
 
-```text
-computer-vision-portfolio/
-├── assignment-1/   # First assignment and local dataset
-├── assignment-2/   # Reserved for the second assignment
-├── .gitignore
-└── README.md
-```
-
-Assignment code, setup instructions, and results will be added as the project develops.
+- [Assignment 1: Waste Object Detection](assignment-1/README.md): read-only dataset
+  audit, measured findings, tests, and a proposed training pipeline. Training has
+  not started.
+- `assignment-2/`: reserved for the theoretical deep metric learning assignment.
 
 ## Dataset
 
-The full dataset is stored locally and is excluded from Git to keep the repository small.
+The full dataset is local and excluded from Git. Place the images and YOLO labels
+in `assignment-1/GarbageDataset/images/` and `assignment-1/GarbageDataset/labels/`.
+The dataset download URL and official class mapping still need to be documented.
+Cloning this repository alone does not provide the dataset.
 
-For assignment 1, place the dataset in this folder:
-
-```text
-assignment-1/GarbageDataset/
-```
-
-The dataset download link and any preparation steps still need to be added. After cloning this repository, obtain the dataset separately and place it at the path above.
+See the Assignment 1 README for environment setup, manual execution, outputs,
+limitations, and the next steps. Aggregate audit results and written findings
+are versioned; generated dataset image previews remain local.
 
 ## Collaboration
 
-Before starting work, pull the latest changes and create a branch for your task. Submit a pull request when your changes are ready for review.
-
-Keep full datasets, local environments, and secrets out of commits. Document any dependencies and steps needed to run each assignment alongside its code.
+Pull the latest changes and create a task branch before making changes. Submit
+a pull request when the work is ready for review. Keep datasets, environments,
+model weights, and secrets out of commits. Document dependencies and run commands
+alongside each assignment. Each member's contribution must be recorded for the
+final submission.
