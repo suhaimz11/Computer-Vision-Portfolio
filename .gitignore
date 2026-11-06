@@ -249,3 +249,6 @@ assignment-1/reports/annotated_examples.jpg
 assignment-1/runs/
 *.pt
 *.pth
+
+# Local random annotation review images and working checklist
+assignment-1/reports/random-review/
