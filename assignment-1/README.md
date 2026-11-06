@@ -3,8 +3,9 @@
 ## Current status
 
 Task 1 is in progress: the initial dataset audit is complete and the training
-pipeline is proposed. Data cleaning, class-name verification, near-duplicate
-review, splitting, and model training have not been performed.
+pipeline is proposed. The student reviewed box placement in 30 random images.
+Cleaning, splitting, and training remain. The lecturer supplied the dataset;
+we use an inferred working class mapping. Near-duplicate analysis is out of scope.
 
 ## Files
 
@@ -60,7 +61,7 @@ invalid source rows are not deleted.
 
 ## Findings
 
-See [the full findings](reports/task-1-findings.md) and [raw results](reports/audit.json).
+See [the full findings](reports/task-1-findings.md), [raw results](reports/audit.json), and [provenance investigation](reports/dataset-provenance.md).
 The scan found 10,464 images (all 416 x 416), 74,073 valid boxes across six IDs,
 and 17 zero-area annotations. No missing/empty/orphan labels or exact image
 duplicates were found. Class 0 accounts for 61.28% of valid boxes, and 36.45% of
@@ -78,7 +79,7 @@ on each selected image is drawn, so the row heading does not describe every box.
 | --- | --- | --- |
 | Detector | Small pretrained YOLO detector | Confirm it was covered in lectures; record exact model and package versions |
 | Cleaning | Remove 17 zero-area rows in a prepared copy with a log | Preserve originals and all remaining valid annotations |
-| Split | Target 70/15/15 train/validation/test, seed 42 | Group related images and preserve multi-label class coverage; verify official splits if available |
+| Split | Target 70/15/15 train/validation/test, seed 42 | Assign each image once and verify all six classes appear in each split |
 | Resolution | 416 baseline; compare 640 on validation if compute permits | All sources are 416 square; upscaling adds no source detail |
 | Augmentation | Moderate scaling, translation, horizontal flips, color/brightness | Training only; inspect transformed boxes and avoid damaging small objects |
 | Training | Up to 100 epochs, patience 20, hardware-dependent batch size | Starting settings; record hardware and adjust using validation |
@@ -104,8 +105,32 @@ preservation. A complete dataset audit is the integration check.
 
 ## Next steps
 
-1. Obtain the authoritative class-ID mapping and dataset source.
-2. Review random per-class examples and suspicious mixed-class annotations.
-3. Check near-duplicates and source groups.
-4. Create a logged prepared dataset and verify the splits.
-5. Finalize the detector and settings after checking lecture coverage and hardware.
+1. Remove the 17 zero-area rows in a separate prepared copy and log removals.
+2. Create reproducible 70/15/15 splits with seed 42 and check class coverage.
+3. Finalize the detector and training settings.
+
+Near-duplicates were not checked, so visually related images across splits
+remain a possible evaluation limitation.
+
+## Random annotation review
+
+The initial contact sheet has been reviewed by the student: all displayed boxes
+were reported to fit visible objects. This is a placement observation only;
+class correctness and dataset-wide quality are not established.
+
+Generate a second, reproducible sample (five images per numeric class):
+
+```powershell
+python assignment-1/sample_annotations.py
+```
+
+From inside `assignment-1`, run `python sample_annotations.py` instead.
+Open the numbered JPG files in `assignment-1/reports/random-review/` and record
+observations in `review.csv`. Each panel shows the original on the left and
+annotations on the right. The generated README explains the checklist values.
+Class names remain unverified. Sampling uses seed 42; images containing multiple
+classes may appear in multiple samples. The generator refuses to overwrite an
+existing review directory so completed notes are preserved. For another sample,
+use `--seed 43 --output assignment-1/reports/random-review/seed-43`.
+Generated previews and working notes remain local and are ignored by Git;
+the student-reported placement review is recorded in the findings.

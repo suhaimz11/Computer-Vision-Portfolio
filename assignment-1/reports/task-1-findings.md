@@ -63,3 +63,33 @@ Training settings and reproducible run commands are outlined in [the assignment 
 This is the initial analysis and pipeline proposal. Metadata verification,
 annotation review, near-duplicate checks, cleaning, and split creation remain
 before the pipeline can be finalized. No model has been trained.
+
+## Initial preview review
+
+The student reported that all boxes displayed in the initial contact sheet fit
+the visible objects. This records a visual placement review of those examples
+only, not verified class correctness, annotation completeness, or whole-dataset
+quality. The subsequent seeded random review is recorded below.
+
+## Random sample placement review
+
+The student confirmed reviewing all 30 panels generated with seed 42 (five
+images per observed class ID, 30 unique images) and reported that boxes fit the
+visible objects. Placement is recorded as pass for these sampled images in the
+local review checklist. This is a student-reported visual assessment, not an
+independent verification of every annotation. Class correctness remains
+unverified, and annotation completeness was not explicitly assessed. The
+review does not establish the quality of images outside the sample. The 17
+zero-area rows identified by the full audit remain in the original dataset;
+invalid rows were not drawn in the previews.
+
+## Current assignment scope
+
+The dataset is lecturer-provided. Use IDs 0-5 with the inferred working names
+listed above; these names are not claimed to come from official metadata.
+Near-duplicate analysis and further provenance investigation are outside scope,
+superseding those prerequisites in the initial pipeline proposal above.
+Next steps are logged removal of the 17 zero-area rows, reproducible dataset
+splitting, and finalization of the training pipeline. No semantic corrections
+were identified by the student's placement review. Related images across
+splits remain a possible evaluation limitation.
