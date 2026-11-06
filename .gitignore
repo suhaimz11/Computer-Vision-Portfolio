@@ -239,3 +239,13 @@ venv/
 .env
 .env.*
 !.env.example
+
+# Local audit previews contain source dataset images
+assignment-1/reports/annotated_examples.jpg
+
+
+# Audit test scratch space and future training outputs
+.audit-tmp/
+assignment-1/runs/
+*.pt
+*.pth
