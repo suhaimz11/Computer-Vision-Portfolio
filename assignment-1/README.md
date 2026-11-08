@@ -55,6 +55,45 @@ Generated image previews and the working checklist are excluded from Git.
 
 See [findings](reports/task-1-findings.md) and [raw results](reports/audit.json).
 
+## Near-duplicate scan
+
+```powershell
+python assignment-1/check_near_duplicates.py
+```
+
+Requires the dependencies in `requirements-audit.txt`. From inside assignment-1,
+install them once with `python -m pip install -r requirements-audit.txt`, then
+run `python check_near_duplicates.py` without extra arguments.
+
+The read-only scan combines 64-bit DCT perceptual hashes (distance <= 6) with
+DINOv2-small image embeddings (cosine similarity >= 0.90). The embedding search
+compares every distinct pair in memory-bounded blocks, with no top-k cutoff.
+All pairs passing either threshold are exported once, each with a preview.
+This does not guarantee every near-duplicate: thresholds can miss matches and
+embeddings can confuse similar objects. Both scores and detection methods are
+included in the CSV. Pair numbers can change between runs; identify images by
+their filenames when transferring previous review decisions.
+
+The first run downloads pretrained weights from Hugging Face. CPU is supported
+but can be slow; CUDA is used if available. Images stay local. The scan writes
+embeddings, image/hash order, model details, candidate pairs and previews under
+`reports/near-duplicates/`, automatically using a numbered folder if it exists.
+Every candidate needs visual review. No decisions or groups are inferred from
+similarity scores. The latest local run flagged 5,952 candidate pairs, including
+32 flagged by both methods. Generated results and the dataset are excluded
+from Git.
+
+To review on another PC, clone the repository and place your own copy of the
+dataset in `assignment-1/GarbageDataset/`. Install the dependencies and run
+`python check_near_duplicates.py` from inside `assignment-1`.
+
+Open the generated `candidates.csv` and matching numbered JPGs in `previews/`.
+Pairs flagged by both methods come first. Set `decision` to `same_source`,
+`different_images`, or `uncertain`, and add notes as needed. Do not change pair
+numbers or filenames. Return the completed CSV to the team. Keep confirmed
+related images together in the future split. No source images or labels have
+been deleted.
+
 ## Proposed training pipeline
 
 | Decision | Starting proposal | Reason / remaining check |

@@ -252,3 +252,7 @@ assignment-1/runs/
 
 # Local random annotation review images and working checklist
 assignment-1/reports/random-review/
+assignment-1/reports/near-duplicates/
+assignment-1/reports/near-duplicates-*/
+assignment-1/reports/duplicate-review/
+assignment-1/duplicate-review.zip

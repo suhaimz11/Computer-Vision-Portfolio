@@ -50,6 +50,8 @@ Invalid rows were not drawn in the previews.
 - Use training-only augmentation and validation data for checkpoint selection.
   Reserve the test set for final evaluation.
 
-Near-duplicates were not checked, so related images across splits remain a
-possible evaluation limitation. Cleaning, splitting, and training are pending.
+A combined perceptual-hash and DINOv2 embedding scan flagged 5,952 candidate
+pairs for manual review; see [review instructions](../README.md#near-duplicate-scan).
+Confirmed related images must remain within one split. Similarity scores alone
+do not confirm duplicates. Cleaning, splitting, and training are pending.
 See [the README](../README.md) for commands and proposed settings.
