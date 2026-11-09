@@ -55,6 +55,41 @@ Generated image previews and the working checklist are excluded from Git.
 
 See [findings](reports/task-1-findings.md) and [raw results](reports/audit.json).
 
+## Duplicate checking
+
+We use the teammate's pipeline in `duplicates/passC/`, with local path setup
+and a Windows launcher. Run `python check_duplicates.py` from `assignment-1`.
+See [script order, outputs and portability changes](duplicates/README.md).
+The matching algorithm and thresholds are unchanged. Status labels reference
+the supplied v3 CSVs rather than the missing historical baseline.
+Our earlier duplicate checker is archived locally. Existing data and completed
+reviews are preserved. The Windows run completed; its 364 candidate pairs are ready for review.
+
+The current [pair review](reports/duplicate-review/README.txt) includes 364
+previews and a CSV checklist. Edit decision to same_source, different_images,
+or uncertain. All entries are pending; historical reference status is not a verdict.
+Run `python preview_duplicates.py` only if generating a fresh review is needed.
+Dataset images and feature caches are local; this specific preview set is versioned.
+
+## Structure
+
+```text
+assignment-1/
+  audit_dataset.py          Dataset integrity and annotation checks
+  sample_annotations.py     Random annotation previews
+  check_duplicates.py       Run the teammate's five pipeline stages
+  duplicates/passC/         Teammate's pipeline with portable path configuration
+  data/team-duplicates/     Teammate's supplied result CSVs
+  data/prepared/            Removal log and local cleaned label copies
+  GarbageDataset/           Original dataset; local only
+  reports/                  Findings and local generated reviews
+  tests/                    Dataset audit tests
+  local-archive/            Our superseded duplicate checker; local only
+```
+
+Datasets, caches, old/generated review runs and local archives are excluded from Git.
+The current 364-pair preview set, code, supplied result CSVs and findings are versioned.
+
 ## Proposed training pipeline
 
 | Decision | Starting proposal | Reason / remaining check |
