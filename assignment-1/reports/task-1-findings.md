@@ -50,8 +50,9 @@ Invalid rows were not drawn in the previews.
 - Use training-only augmentation and validation data for checkpoint selection.
   Reserve the test set for final evaluation.
 
-A combined perceptual-hash and DINOv2 embedding scan flagged 5,952 candidate
-pairs for manual review; see [review instructions](../README.md#near-duplicate-scan).
-Confirmed related images must remain within one split. Similarity scores alone
-do not confirm duplicates. Cleaning, splitting, and training are pending.
-See [the README](../README.md) for commands and proposed settings.
+The current teammate-based SIFT/RootSIFT loose search produced 364 candidate
+pairs with at least 15 RANSAC inliers. Review decisions remain pending; see
+[review instructions](duplicate-review/README.txt) and the accompanying previews.
+Historical team groups are supplied separately as reference metadata. No list
+proves that all other images are unique. Keep confirmed related images together
+in the future split. Cleaning verification, splitting and training remain pending.

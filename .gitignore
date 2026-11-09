@@ -254,5 +254,15 @@ assignment-1/runs/
 assignment-1/reports/random-review/
 assignment-1/reports/near-duplicates/
 assignment-1/reports/near-duplicates-*/
-assignment-1/reports/duplicate-review/
+assignment-1/reports/duplicate-review-*/
 assignment-1/duplicate-review.zip
+assignment-1/reports/unsure-review*/
+assignment-1/reports/confirmed-review*/
+assignment-1/reports/verified-review*/
+
+# Local originals, prepared dataset copies, and model feature caches
+assignment-1/local-archive/
+assignment-1/data/prepared/labels/
+*.pkl
+assignment-1/reports/team-duplicates-run*/
+assignment-1/reports/manual-group-review/

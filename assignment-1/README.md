@@ -55,44 +55,40 @@ Generated image previews and the working checklist are excluded from Git.
 
 See [findings](reports/task-1-findings.md) and [raw results](reports/audit.json).
 
-## Near-duplicate scan
+## Duplicate checking
 
-```powershell
-python assignment-1/check_near_duplicates.py
+We use the teammate's pipeline in `duplicates/passC/`, with local path setup
+and a Windows launcher. Run `python check_duplicates.py` from `assignment-1`.
+See [script order, outputs and portability changes](duplicates/README.md).
+The matching algorithm and thresholds are unchanged. Status labels reference
+the supplied v3 CSVs rather than the missing historical baseline.
+Our earlier duplicate checker is archived locally. Existing data and completed
+reviews are preserved. The Windows run completed; its 364 candidate pairs are ready for review.
+
+The current [pair review](reports/duplicate-review/README.txt) includes 364
+previews and a CSV checklist. Edit decision to same_source, different_images,
+or uncertain. All entries are pending; historical reference status is not a verdict.
+Run `python preview_duplicates.py` only if generating a fresh review is needed.
+Dataset images and feature caches are local; this specific preview set is versioned.
+
+## Structure
+
+```text
+assignment-1/
+  audit_dataset.py          Dataset integrity and annotation checks
+  sample_annotations.py     Random annotation previews
+  check_duplicates.py       Run the teammate's five pipeline stages
+  duplicates/passC/         Teammate's pipeline with portable path configuration
+  data/team-duplicates/     Teammate's supplied result CSVs
+  data/prepared/            Removal log and local cleaned label copies
+  GarbageDataset/           Original dataset; local only
+  reports/                  Findings and local generated reviews
+  tests/                    Dataset audit tests
+  local-archive/            Our superseded duplicate checker; local only
 ```
 
-Requires the dependencies in `requirements-audit.txt`. From inside assignment-1,
-install them once with `python -m pip install -r requirements-audit.txt`, then
-run `python check_near_duplicates.py` without extra arguments.
-
-The read-only scan combines 64-bit DCT perceptual hashes (distance <= 6) with
-DINOv2-small image embeddings (cosine similarity >= 0.90). The embedding search
-compares every distinct pair in memory-bounded blocks, with no top-k cutoff.
-All pairs passing either threshold are exported once, each with a preview.
-This does not guarantee every near-duplicate: thresholds can miss matches and
-embeddings can confuse similar objects. Both scores and detection methods are
-included in the CSV. Pair numbers can change between runs; identify images by
-their filenames when transferring previous review decisions.
-
-The first run downloads pretrained weights from Hugging Face. CPU is supported
-but can be slow; CUDA is used if available. Images stay local. The scan writes
-embeddings, image/hash order, model details, candidate pairs and previews under
-`reports/near-duplicates/`, automatically using a numbered folder if it exists.
-Every candidate needs visual review. No decisions or groups are inferred from
-similarity scores. The latest local run flagged 5,952 candidate pairs, including
-32 flagged by both methods. Generated results and the dataset are excluded
-from Git.
-
-To review on another PC, clone the repository and place your own copy of the
-dataset in `assignment-1/GarbageDataset/`. Install the dependencies and run
-`python check_near_duplicates.py` from inside `assignment-1`.
-
-Open the generated `candidates.csv` and matching numbered JPGs in `previews/`.
-Pairs flagged by both methods come first. Set `decision` to `same_source`,
-`different_images`, or `uncertain`, and add notes as needed. Do not change pair
-numbers or filenames. Return the completed CSV to the team. Keep confirmed
-related images together in the future split. No source images or labels have
-been deleted.
+Datasets, caches, old/generated review runs and local archives are excluded from Git.
+The current 364-pair preview set, code, supplied result CSVs and findings are versioned.
 
 ## Proposed training pipeline
 
