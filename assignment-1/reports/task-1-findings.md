@@ -51,8 +51,11 @@ Invalid rows were not drawn in the previews.
   Reserve the test set for final evaluation.
 
 The current teammate-based SIFT/RootSIFT loose search produced 364 candidate
-pairs with at least 15 RANSAC inliers. Review decisions remain pending; see
+pairs with at least 15 RANSAC inliers. All pairs have been reviewed: 341
+`same_source` and 23 `different_images`; see
 [review instructions](duplicate-review/README.txt) and the accompanying previews.
 Historical team groups are supplied separately as reference metadata. No list
 proves that all other images are unique. Keep confirmed related images together
-in the future split. Cleaning verification, splitting and training remain pending.
+in the split. `prepare_split.py` verifies cleaned labels and assigns connected
+duplicate groups together, targeting 70/15/15 with seed 42. Actual counts and
+class coverage are recorded in `data/split/summary.json`. Training remains pending.

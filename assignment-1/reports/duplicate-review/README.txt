@@ -1,6 +1,6 @@
 # Duplicate pair review
 
-This review contains 364 unique candidate pairs from the teammate's SIFT/RootSIFT
+This review contains 364 unique candidate pairs from the SIFT/RootSIFT
 pipeline, using the loose-search output with at least 15 RANSAC inliers.
 These pairs are not automatically confirmed duplicates. All decisions start pending.
 

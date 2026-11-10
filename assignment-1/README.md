@@ -1,7 +1,8 @@
 # Assignment 1: Waste Object Detection
 
-The dataset audit and visual review are complete. Cleaning, splitting, and
-model training are next.
+The dataset audit, visual review and duplicate pair review are complete.
+The reproducible split workflow verifies cleaned labels before assigning data.
+Model training has not started.
 
 ## Setup
 
@@ -63,11 +64,12 @@ See [script order, outputs and portability changes](duplicates/README.md).
 The matching algorithm and thresholds are unchanged. Status labels reference
 the supplied v3 CSVs rather than the missing historical baseline.
 Our earlier duplicate checker is archived locally. Existing data and completed
-reviews are preserved. The Windows run completed; its 364 candidate pairs are ready for review.
+reviews are preserved. All 364 candidate pairs have been reviewed: 341 are
+`same_source` and 23 are `different_images`.
 
 The current [pair review](reports/duplicate-review/README.txt) includes 364
 previews and a CSV checklist. Edit decision to same_source, different_images,
-or uncertain. All entries are pending; historical reference status is not a verdict.
+or uncertain. The current review is complete; historical reference status is not a verdict.
 Run `python preview_duplicates.py` only if generating a fresh review is needed.
 Dataset images and feature caches are local; this specific preview set is versioned.
 
@@ -116,6 +118,15 @@ python -m unittest discover -s assignment-1/tests -v
 
 ## Next steps
 
-1. Remove the 17 zero-area rows in a separate copy and save a removal log.
-2. Split the cleaned data 70/15/15 with seed 42 and check class coverage.
-3. Finalize the model and training settings.
+Run `python assignment-1/prepare_split.py` from the repository root to verify
+the supplied cleaned labels against originals and the removal log, then produce
+a group-aware 70/15/15 split with seed 42. Confirmed duplicate groups stay in
+one subset. The script refuses to overwrite existing output; use `--output`
+for a fresh destination. See [split outputs and training setup](data/split-README.md).
+
+Run `python assignment-1/export_yolo.py` from the repository root to copy the
+fixed split with cleaned labels into `data/processed/` and generate `data.yaml`.
+Every copied image and label is checked against its source. Existing output
+folders are refused. See the split documentation linked above for details.
+
+Next: confirm official class names and finalize the model and training settings.
