@@ -141,3 +141,64 @@ A triplet is only valid for training when all of the following hold. Section 4 m
 4. For each anchor-positive pair choose a negative (all triplets during warm-up, semi-hard afterwards).
 5. Average `max(0, d(a, p) - d(a, n) + m)` over the chosen triplets with non-zero loss.
 6. Update the network weights with the gradient of that average; repeat with a new batch.
+
+---
+
+## 4. Sampling strategy for this dataset
+
+The strategy has three layers: which crops may be used at all (4.1), how a batch is drawn from them (4.2 to 4.4), and which triplets inside the batch are used (3.4 and 4.5). Every rule answers one of the measured properties in section 1.3. All counts below are for the training split (7,325 images, 51,861 crops); the validation and test splits are never sampled or capped for training.
+
+### 4.1 Which crops are eligible: minimum size and context
+
+- **Minimum size: 24 pixels on the short side.** Crops below about 12 pixels are colour blobs with no recognisable shape, and between 12 and 24 pixels the signal is weak; such a crop behaves like a wrong label. A threshold of 24 pixels keeps 39,574 of the 51,861 training crops (76.3%). Biodegradable loses the most (31%), because its objects are the smallest; the other classes lose 6% to 18%. We treat 24 as a setting to tune on validation, with 16 and 32 pixels as the alternatives.
+- **Context padding and resizing.** The boxes are tight. We enlarge each box by 10% to 20% so that shape and surface cues at the edge are kept, pad to a square, and resize to one fixed size (for example 128 x 128). The padding is limited because boxes are often nested or touching (a third of the boxes lie more than half inside another box), so a wide margin would bring pieces of neighbouring objects into the crop.
+
+### 4.2 Draw the image first, then the crop
+
+If a class's crops were drawn uniformly, they would often come from the same few photos. A simulation on the training split shows that 16 plastic crops drawn at random come from 16 different photos only about half the time (49.9%), and 16 cardboard crops in two thirds of the draws (66.9%); with K = 8 the figures are 84% and 91%. Crops from one photo share lighting, background and camera, so they are too easy as positives, they teach the network to match backgrounds, and in crowded piles they are even overlapping fragments of one object.
+
+For each class in a batch we therefore proceed in this order:
+
+1. choose K images that contain an eligible crop of that class, uniformly at random and from K different duplicate groups;
+2. from each chosen image take one eligible crop of that class (two only when a class has too few images, which does not happen with K = 8 or 16, since every class occurs in at least 1,024 training images).
+
+Choosing the image uniformly instead of the crop also removes the weight of crowded photos: the image-level imbalance is mild (1,024 to 1,885 training images per class, a factor of 1.8) while the crop-level imbalance is 10.3.
+
+### 4.3 Class-balanced batches and a cap per image
+
+- **Every batch contains all six classes with K crops each** (P x K, section 3.3), so no batch is dominated by biodegradable.
+- **At most 10 crops per image per epoch.** Whenever an image has more than 10 eligible crops, a random 10 are the only ones available in that epoch; a new random 10 are drawn in the next epoch, so no crop is lost for good. Together with the size filter, an epoch has about 23,708 crops and the largest-to-smallest class ratio falls from 10.3 to 3.7 (the biodegradable count falls from 31,772 to about 9,100, the others stay between 2,500 and 4,050). The cap acts per epoch, the one-crop-per-image rule of 4.2 acts per batch; the two are complementary.
+- **An epoch is a fixed number of iterations**, not a pass over all crops, because the batches are balanced and not proportional to the data.
+
+How often a crop is seen follows from this. With equal class shares and the full training set, each biodegradable crop would be seen 0.27 times per epoch and each paper crop 2.8 times, a ten-fold difference. With the size filter and the cap the range narrows to 0.43 to 1.59 times. Rare-class crops are still repeated more often, so augmentation (flips, scale changes, colour jitter) is applied to the training crops to keep the network from memorising them.
+
+### 4.4 Duplicate photos
+
+The images look like a Roboflow export containing flipped, rotated and re-cropped copies of the same photo; our own search found about 300 duplicate groups (about 6% of the images). For the training samples this means:
+
+- two crops from one duplicate group are never in the same batch (4.2), so a copy cannot appear as another sample's negative or as a free positive;
+- the split into training, validation and test is made by duplicate group, as in the team's fixed split, so that no duplicate of a test or validation photo is trained on. Duplicates that our search missed remain possible and would make validation scores slightly optimistic.
+
+### 4.5 Which negatives: warm-up, then semi-hard, with care for the confusable pairs
+
+Section 3.4 gives the mining rule: all valid triplets for a short warm-up, then semi-hard negatives. The dataset adds three reasons to avoid the hardest negatives:
+
+- **Label noise and fuzzy classes.** Paper and cardboard are labelled inconsistently, and boxes in glass-named images contain about 14% metal crops. A hardest-negative rule would single out exactly these cases and ask the network to separate things that the labels do not separate.
+- **Tiny and truncated crops.** Even above 24 pixels, a crop may show only part of an object; within a 2-pixel tolerance, 50% of the paper boxes and 33% of the cardboard boxes touch the image border.
+- **Nested boxes.** 52% of the plastic boxes lie more than half inside another box, so a "negative" may contain a piece of the anchor's own object.
+
+The pairs we expect to produce most hard negatives, and therefore monitor, are glass and metal, glass and plastic, and paper and cardboard. If they remain mixed late in training, the batches can be changed for the last epochs so that these classes are drawn together with a larger K (a curriculum from easy to hard); this is an option, not a requirement of the method.
+
+### 4.6 Summary of the strategy
+
+| Component | Choice | Dataset reason | To be tuned on validation |
+| --- | --- | --- | --- |
+| Unit | Object crop from the cleaned boxes | Images hold several objects and classes | no |
+| Minimum size | 24 px on the short side | 24% of crops are below 24 px; tiny crops carry no signal | 16, 32 px |
+| Context | 10% to 20% padding, square, fixed size | Tight boxes, nested neighbours | padding, size |
+| Batch | P = 6 classes x K = 8 (or 16) crops | 61% majority class; every class needs positives | K |
+| Sampling unit | Image first, one crop per image per batch | Crowded images; plastic draws 16 distinct photos only half the time | no |
+| Epoch cap | 10 crops per image per epoch, redrawn | Top 1% of images hold 21% of crops | 5, 10, 20 |
+| Duplicates | One crop per duplicate group per batch; split by group | About 300 groups | no |
+| Negatives | Warm-up on all triplets, then semi-hard | Label noise, tiny and truncated crops | warm-up length, margin |
+| Augmentation | Flip, scale, colour jitter | Rare-class crops are repeated | strength |
