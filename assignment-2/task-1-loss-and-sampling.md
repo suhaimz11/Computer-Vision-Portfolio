@@ -38,3 +38,48 @@ All numbers were computed on the cleaned labels (17 zero-area rows removed) and,
 | Confusable materials | Glass, metal and plastic share shapes (bottles, cans); paper and cardboard overlap; glass-named images contain about 14% metal crops. | These pairs produce the hard negatives. They need care in mining. |
 
 Sections 2 to 6 use these facts to choose the loss (section 2), explain how samples are combined (section 3), design the sampling strategy (section 4), discuss its effect on training and on the embedding space (section 5), and state limits and alternatives (section 6).
+
+---
+
+## 2. The loss: triplet loss with a margin
+
+### 2.1 Principle and objective
+
+Let `f` be a neural network (a pretrained convolutional backbone with a small fully connected head) that maps a crop `x` to an embedding vector `f(x)` of 128 numbers. We L2-normalise it, so every embedding has length 1 and lies on the unit sphere. The distance between two crops is the Euclidean distance of their embeddings, `d(x, y) = || f(x) - f(y) ||`.
+
+The triplet loss works on three crops at once, with the same network `f` (shared weights) applied to each:
+
+- the **anchor** `a`, any crop;
+- the **positive** `p`, another crop of the same class as `a`;
+- the **negative** `n`, a crop of a different class.
+
+For one triplet the loss is
+
+$$\mathcal{L}(a, p, n) = \max\bigl(0,\; d(a, p) - d(a, n) + m\bigr),$$
+
+where `m > 0` is the **margin**. The training objective is to make, for every triplet, the negative farther from the anchor than the positive by at least the margin: `d(a, n) >= d(a, p) + m`. A triplet that already satisfies this contributes loss 0; a triplet that does not is pulled into order, because the gradient moves `a` towards `p` and away from `n`. The loss for a batch is the average over the triplets in it (in practice often over the non-zero ones only). After training, crops of one class form a compact cluster and clusters of different classes are separated by roughly the margin.
+
+### 2.2 Three kinds of triplet
+
+For a fixed margin, a triplet falls into one of three cases, depending on where the negative lies relative to the positive:
+
+| Case | Condition | Loss | What it teaches |
+| --- | --- | --- | --- |
+| Easy | `d(a, n) >= d(a, p) + m` | 0 | Nothing: already correct. |
+| Semi-hard | `d(a, p) < d(a, n) < d(a, p) + m` | between 0 and `m` | Negative is farther than the positive but inside the margin. Correct order, not enough room. |
+| Hard | `d(a, n) < d(a, p)` | greater than `m` | Negative is closer than the positive: the embedding is wrong here. |
+
+Worked example with `d(a, p) = 1` and `m = 0.5`: a negative at distance 2 is easy (loss 0); at 1.2 it is semi-hard (loss `1 - 1.2 + 0.5 = 0.3`); at 0.8 it is hard (loss `1 - 0.8 + 0.5 = 0.7`). With `d(a, p) = 1` and `d(a, n) = 1.5` the loss is `max(0, m - 0.5)`: it is 0 for any `m <= 0.5`, 0.5 for `m = 1` and 1.5 for `m = 2`.
+
+This is why the sampling strategy decides whether anything is learned: if most sampled triplets are easy, the loss is 0 and the gradient vanishes; if they are all hard, training can collapse (section 5).
+
+### 2.3 The margin
+
+Because the embeddings lie on the unit sphere, distances lie between 0 and 2, and a margin must be achievable. Six classes whose centres are as far apart as possible (the corners of a regular simplex on the sphere) are at distance `sqrt(2 * 6 / 5) = 1.55`. The margin therefore has to be well below this, and also leave room for the spread inside each class. We start with `m = 0.2` and tune it on the validation split; published tuned runs of the triplet loss also found small margins (about 0.1) best. The margin controls the trade-off: too small and almost every triplet is already satisfied (no gradient, clusters stay close); too large and nearly all triplets stay active, so the loss never reaches zero and training pushes harder than the geometry allows.
+
+### 2.4 Why the triplet loss for this dataset
+
+1. **It uses relative distances.** The lecture notes that metric learning is robust to class imbalance because it learns relative distances instead of absolute class distributions. The loss never asks "how many examples has this class", only "is the positive closer than the negative".
+2. **Sampling controls the imbalance.** With 61% of all crops in one class, the imbalance cannot be removed by the loss alone; the triplet loss lets us fix it where it arises, in how anchors, positives and negatives are drawn (section 4).
+3. **It is transparent.** The margin and the three triplet cases can be explained and checked by hand, which matches the lecture (deck 07, pages 14 and 15: triplet loss, with the note that the sampling strategy is important).
+4. **The alternatives were considered.** The contrastive loss uses pairs and the same margin idea; Proxy-NCA and Proxy-Anchor replace sampled negatives with one learned vector per class and would also suit six classes; ArcFace is a classification loss with an angular margin. Section 6 explains why we keep the triplet loss and what we would change if we did not.
