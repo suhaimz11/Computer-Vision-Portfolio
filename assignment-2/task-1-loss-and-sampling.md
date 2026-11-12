@@ -2,7 +2,7 @@
 
 Deep metric learning for automated waste sorting (theoretical solution; nothing is implemented or trained).
 
-> Work in progress. Sections 2 to 6 follow.
+Contents: 1 Setting and dataset characteristics; 2 The loss; 3 How samples are selected and combined; 4 Sampling strategy for this dataset; 5 Influence of the sampling on training and on the embedding space; 6 Limits, alternatives and references.
 
 **Task.** Choose a deep metric learning loss for learning an embedding of the waste categories. Describe (a) the principle and objective of the loss, (b) how training samples must be selected and combined for it, and (c) a sampling strategy for the given dataset. Discuss how the sampling strategy influences training and the resulting embedding space, and justify the decisions with the dataset's characteristics.
 
@@ -252,3 +252,52 @@ Positives are chosen at random among the other K - 1 crops of the class, not as 
 | Positives of one class in a batch | Often from the same photo (K = 16 plastic crops come from different photos only half of the time) | From different photos and different duplicate groups, by construction |
 | Informative triplets | Few; mostly easy | Semi-hard, with a warm-up |
 | Tiny, unrecognisable crops | Included | Excluded below 24 pixels |
+
+---
+
+## 6. Limits, alternatives and references
+
+### 6.1 Limits of the proposal
+
+- **Nothing is trained.** The effects in section 5 are expectations from the theory and from published studies. The numerical settings (24 pixels, 10 crops per image, K = 8 or 16, margin 0.2, the warm-up length) are design choices, and each would be tuned on the validation split, never on the test split.
+- **Labels.** The class names are inferred from the file names, and paper and cardboard are labelled inconsistently. Semi-hard mining reduces the damage of noisy labels but does not remove it.
+- **Small and truncated objects.** Crops below 24 pixels are not trained on, and boxes at the image border or inside other boxes show only part of an object. Embeddings of such crops will be less reliable, so results should be reported by crop size.
+- **Duplicates.** The duplicate groups come from our own search, which is not guaranteed to be complete (on planted copies it recovered about 93%). Missed duplicates would make validation scores slightly optimistic.
+- **Background shortcuts.** Many images come from similar stock-photo settings; the network may use a background (for example a white table behind a transparent bottle) instead of the material. Distinct photos for the positives and augmentation reduce, but do not remove, this risk.
+- **Sensitivity of the loss.** The triplet loss depends more on its sampling than the alternatives below. In a large comparison with tuned hyperparameters, classification-style and proxy-based losses were at or a few points above the triplet-based losses (Musgrave et al., 2020), so the choice here rests on fit with the task and transparency, not on a leaderboard gap.
+- **Closed set.** All six classes are seen in training. The design does not tell how well the space generalises to a material that was not in the training data.
+
+### 6.2 Alternatives and why we did not choose them
+
+| Alternative | How it works | Why not the main choice here |
+| --- | --- | --- |
+| Contrastive loss (Hadsell et al., 2006; lecture deck 07, page 16) | Works on pairs: positive pairs are pulled together, negative pairs are pushed beyond a margin | Compares each pair with a fixed margin and not one pair with another, so it ignores relative distances; it needs the same sampling care as the triplet loss |
+| Proxy-NCA and Proxy-Anchor (Movshovitz-Attias et al., 2017; Kim et al., 2020; lecture deck 07, pages 17 and 18) | One learned vector (proxy) per class replaces the sampled positives and negatives, so no triplet mining is needed | Well suited to six classes and the first thing we would try if mining proved unstable. It makes the sampling question less central, which is the subject of this task, and it is not defined in the lecture beyond Proxy-NCA |
+| ArcFace (Deng et al., 2019; lecture deck 07, pages 20 and 21) | A classification loss with an angular margin between the class directions | Designed for very many classes; with six, its advantage is small, and the embedding is tuned for classification rather than for nearest-neighbour retrieval |
+| Multi-similarity loss and supervised contrastive loss (Wang et al., 2019; Khosla et al., 2020) | Use all positive and negative pairs of a batch with weights | Would work on the same P x K batches; they are not covered in the lecture |
+
+The sampling strategy of section 4 does not depend on the triplet loss. The size filter, the image-first drawing, the cap per image, the duplicate rule and the balanced P x K batches would be used unchanged with any of the losses above; only the mining rule of section 3.4 is specific to the triplet loss.
+
+### 6.3 How this answers the task
+
+| Requirement of the task | Where |
+| --- | --- |
+| Choice of a loss, its principle and objective | Section 2 |
+| How samples are selected and combined for this loss | Section 3 |
+| A sampling strategy designed for this dataset, with justification | Sections 1.3 and 4 |
+| Influence of the sampling on training and on the embedding space | Section 5 |
+| Limits and alternatives | Section 6 |
+
+### 6.4 References
+
+1. Hadsell, R., Chopra, S., LeCun, Y. Dimensionality reduction by learning an invariant mapping. CVPR 2006. http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
+2. Schroff, F., Kalenichenko, D., Philbin, J. FaceNet: a unified embedding for face recognition and clustering. CVPR 2015. https://arxiv.org/abs/1503.03832
+3. Hermans, A., Beyer, L., Leibe, B. In defense of the triplet loss for person re-identification. 2017. https://arxiv.org/abs/1703.07737
+4. Wu, C.-Y., Manmatha, R., Smola, A. J., Krahenbuhl, P. Sampling matters in deep embedding learning. ICCV 2017. https://arxiv.org/abs/1706.07567
+5. Movshovitz-Attias, Y., Toshev, A., Leung, T. K., Ioffe, S., Singh, S. No fuss distance metric learning using proxies. ICCV 2017. https://arxiv.org/abs/1703.07464
+6. Wang, X., Han, X., Huang, W., Dong, D., Scott, M. R. Multi-similarity loss with general pair weighting for deep metric learning. CVPR 2019. https://arxiv.org/abs/1904.06627
+7. Deng, J., Guo, J., Xue, N., Zafeiriou, S. ArcFace: additive angular margin loss for deep face recognition. CVPR 2019. https://arxiv.org/abs/1801.07698
+8. Kim, S., Kim, D., Cho, M., Kwak, S. Proxy anchor loss for deep metric learning. CVPR 2020. https://arxiv.org/abs/2003.13911
+9. Khosla, P., et al. Supervised contrastive learning. NeurIPS 2020. https://arxiv.org/abs/2004.11362
+10. Musgrave, K., Belongie, S., Lim, S.-N. A metric learning reality check. ECCV 2020. https://arxiv.org/abs/2003.08505
+11. Lecture "Deep Metric Learning" (deck 07): pages 9 and 10 (sampling strategies), 14 and 15 (triplet loss), 16 (contrastive loss), 17 and 18 (Proxy-NCA), 20 and 21 (ArcFace).
