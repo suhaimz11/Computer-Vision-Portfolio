@@ -1,0 +1,83 @@
+{
+  "seed": 42,
+  "target_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "algorithm": "grouped greedy balance of image counts, per-class image presence and box counts; numpy default_rng",
+  "numpy_version": "2.5.4",
+  "images": 10464,
+  "groups": 10156,
+  "duplicate_groups": 267,
+  "largest_group": 5,
+  "removed_zero_area_rows": 17,
+  "review_decisions": {
+    "same_source": 341,
+    "different_images": 23
+  },
+  "review_sha256": "6b04b6f72acdef792e924c04c42f17faf9a978c23f313ef947faa0a185a7f7b3",
+  "clean_label_content_sha256": "dbd4b10ff76e9cbfb1863953fa3f38ec54c6cf3ce2865da1174ffed1ec399413",
+  "splits": {
+    "train": {
+      "images": 7325,
+      "fraction": 0.7000191131498471,
+      "boxes_by_class_id": [
+        31772,
+        3289,
+        5476,
+        4091,
+        3072,
+        4161
+      ],
+      "images_by_class_id": [
+        1601,
+        1051,
+        1885,
+        1328,
+        1237,
+        1024
+      ]
+    },
+    "val": {
+      "images": 1570,
+      "fraction": 0.15003822629969418,
+      "boxes_by_class_id": [
+        6818,
+        704,
+        1168,
+        875,
+        657,
+        892
+      ],
+      "images_by_class_id": [
+        343,
+        226,
+        401,
+        285,
+        266,
+        220
+      ]
+    },
+    "test": {
+      "images": 1569,
+      "fraction": 0.1499426605504587,
+      "boxes_by_class_id": [
+        6805,
+        703,
+        1165,
+        875,
+        658,
+        892
+      ],
+      "images_by_class_id": [
+        343,
+        225,
+        398,
+        285,
+        265,
+        220
+      ]
+    }
+  }
+}

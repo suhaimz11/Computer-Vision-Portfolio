@@ -263,6 +263,8 @@ assignment-1/reports/verified-review*/
 # Local originals, prepared dataset copies, and model feature caches
 assignment-1/local-archive/
 assignment-1/data/prepared/labels/
+assignment-1/data/processed/
+assignment-1/data/split-check/
 *.pkl
 assignment-1/reports/team-duplicates-run*/
 assignment-1/reports/manual-group-review/
