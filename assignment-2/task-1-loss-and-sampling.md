@@ -202,3 +202,53 @@ The pairs we expect to produce most hard negatives, and therefore monitor, are g
 | Duplicates | One crop per duplicate group per batch; split by group | About 300 groups | no |
 | Negatives | Warm-up on all triplets, then semi-hard | Label noise, tiny and truncated crops | warm-up length, margin |
 | Augmentation | Flip, scale, colour jitter | Rare-class crops are repeated | strength |
+
+---
+
+## 5. How the sampling strategy influences training and the embedding space
+
+The loss only ever sees the triplets that the sampling produces. The same network, loss and data can therefore give a useful or a useless embedding, depending only on which crops are drawn and which triplets are formed. This section follows that chain: sampling decides the gradient (training), and the gradient decides the geometry (embedding space). The effects described are what the theory and published experience lead us to expect; they are not results of an experiment, since nothing is trained in this assignment.
+
+### 5.1 Influence on the training process
+
+| Sampling choice | What happens during training |
+| --- | --- |
+| Random triplets | Almost every triplet is easy, so the loss is nearly 0 and the gradient is close to zero: training stalls. Averaging over all triplets, including the zeros, shrinks the gradient even further. |
+| Only the hardest negatives | The largest gradients come from the most extreme cases, which are the mislabelled, tiny or truncated crops in this dataset. Early in training this also pushes the embedding towards collapse (all crops at nearly one point), as reported for the hardest-negative rule in the original FaceNet work and in later studies. |
+| Semi-hard negatives after a warm-up | Each triplet has a positive loss but a correct order, so the gradient is informative and bounded. Training is stable and every step teaches something. |
+| Class frequencies as they come (random batches) | 61% of the crops, and 83.5% of all triplets, have a biodegradable anchor. The updates are dominated by that class, and the rare classes are learned last and worst. |
+| Class-balanced P x K batches | Each class supplies K anchors, one sixth of the anchors in every step, so every class has an equal say in the update. |
+| Many crops from one image, or duplicates in one batch | Positives are too easy (same background, same lighting) and the loss can be reduced by matching photos rather than materials. A duplicate used as a negative produces a large loss for a pair that is in fact the same object, which is a wrong learning signal. |
+| One crop per image and per duplicate group | Positives come from different photos, so the network must find what the crops of one material have in common. |
+| A cap on crops per image | A few crowded photos cannot dominate an epoch. |
+| Repeating rare-class crops more often | Without augmentation the network can memorise them; with flips, scale changes and colour jitter, repetition is harmless. |
+
+Two quantities are worth watching during training: the fraction of triplets with non-zero loss in a batch (close to 100% means the margin is too large or the embedding is still random; close to 0% means the sampling gives only easy triplets), and the mean positive and negative distances (collapse shows as both going to 0).
+
+### 5.2 Influence on the embedding space
+
+| Sampling choice | Effect on the geometry of the embedding space |
+| --- | --- |
+| Random batches, imbalanced | The biodegradable region is large and well shaped; rare classes are squeezed and their boundaries are set by the majority class. A rare-class crop near a boundary is placed with biodegradable, so a nearest-neighbour rule favours the majority. |
+| Class-balanced batches | Clusters of comparable size and spacing; no class is favoured at the boundaries. |
+| Easy-only triplets | The embedding stays close to what the pretrained network gave at the start; clusters are loose and touch, because nothing pushes them apart. |
+| Hardest-only triplets | A collapsed embedding, or clusters fitted to label noise: a mislabelled crop pulls its whole class region towards the wrong place. |
+| Semi-hard triplets | Clusters separated by roughly the margin, with a cleaner boundary; the spread inside a class is not forced to zero. |
+| Same-photo positives and duplicates | Small islands of crops from one photo appear, so that the nearest neighbours of a crop are other crops of the same picture rather than other objects of the same material; retrieval then looks good on paper and fails on new photos. |
+| Distinct photos for the positives | The space is organised by material and shape, not by photo, background or camera. |
+| Excluding crops below 24 pixels | No catch-all region where unrecognisable crops pile up. The price is that very small objects (about a quarter of all crops, 24% under 24 pixels) are never trained on, so their embeddings will be less reliable; Task 2 should report results by crop size. |
+| Focus on confusable pairs (glass, metal, plastic) | These are the classes that provide the semi-hard negatives, so they receive most of the gradient and their boundaries are sharpened first. If the focus is too strong, the network may separate them by background cues (a transparent bottle on a white table) rather than by material. |
+
+### 5.3 What the final space is expected to look like
+
+Positives are chosen at random among the other K - 1 crops of the class, not as the farthest one, so the loss does not force one compact ball per class. A class may form several sub-clusters, for example fruit and vegetable crops within biodegradable, or bottles and bags within plastic. This is acceptable because nearest-neighbour retrieval and classification (the subject of Task 2) only need the nearest crops to be of the right class, not one centre per class. The classes that share shapes, such as glass, metal and plastic, are expected to remain the closest together; the clusters of cardboard and paper, which look alike but are labelled less consistently, are expected to overlap most.
+
+### 5.4 Before and after
+
+| | Random batches and triplets | Our strategy |
+| --- | --- | --- |
+| Share of anchors from the biodegradable class | 83.5% of all triplets (61% of the crops) | 16.7% (one class in six) |
+| Class exposure per epoch (ratio of most to least seen crop) | about 10 to 1 across the training set | about 3.7 to 1 after the size filter and the cap |
+| Positives of one class in a batch | Often from the same photo (K = 16 plastic crops come from different photos only half of the time) | From different photos and different duplicate groups, by construction |
+| Informative triplets | Few; mostly easy | Semi-hard, with a warm-up |
+| Tiny, unrecognisable crops | Included | Excluded below 24 pixels |
