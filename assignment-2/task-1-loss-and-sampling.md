@@ -83,3 +83,61 @@ Because the embeddings lie on the unit sphere, distances lie between 0 and 2, an
 2. **Sampling controls the imbalance.** With 61% of all crops in one class, the imbalance cannot be removed by the loss alone; the triplet loss lets us fix it where it arises, in how anchors, positives and negatives are drawn (section 4).
 3. **It is transparent.** The margin and the three triplet cases can be explained and checked by hand, which matches the lecture (deck 07, pages 14 and 15: triplet loss, with the note that the sampling strategy is important).
 4. **The alternatives were considered.** The contrastive loss uses pairs and the same margin idea; Proxy-NCA and Proxy-Anchor replace sampled negatives with one learned vector per class and would also suit six classes; ArcFace is a classification loss with an angular margin. Section 6 explains why we keep the triplet loss and what we would change if we did not.
+
+---
+
+## 3. How training samples are selected and combined
+
+### 3.1 Too many triplets to list
+
+The training split holds 51,861 crops. Every ordered choice of an anchor, a positive of the same class and a negative of another class is a valid triplet, which gives about 2.4 x 10^13 triplets. We cannot use all of them, and most would be useless: the loss of an easy triplet is 0. Worse, if triplets were drawn uniformly, 83.5% of them would have a biodegradable anchor, because that class owns 61% of the crops and its crops appear in many more combinations. The selection rule is therefore part of the method, not a detail.
+
+### 3.2 Online instead of offline triplet formation
+
+There are two ways to form triplets:
+
+- **Offline:** embed the whole training set with the current network, list the triplets, then train on that list. The list is out of date after the first few updates, because the embedding has already changed, and embedding 51,861 crops again for each list is expensive.
+- **Online:** draw a batch of crops, embed it with the current network, and form triplets inside the batch from those fresh embeddings. Which triplets are easy, semi-hard or hard is always judged with the network as it is now.
+
+We use online formation, since it is cheap and always current.
+
+### 3.3 The batch: P classes x K crops
+
+Triplets can only be formed inside a batch if the batch contains both positives and negatives for each anchor. A random batch of 48 crops from this dataset would contain about 29 biodegradable crops but only about 3 paper crops, and in roughly one batch in five at most one paper crop, which leaves that anchor without a positive. We therefore build each batch as **P x K**: P classes with K crops of each. Since there are only six classes, P = 6, so every batch contains all classes, and every anchor has K - 1 positives and (P - 1) x K negatives.
+
+| Setting | Batch size | Triplets formed from one batch |
+| --- | --- | --- |
+| P = 6, K = 8 | 48 | 48 x 7 x 40 = 13,440 |
+| P = 6, K = 16 | 96 | 96 x 15 x 80 = 115,200 |
+
+One forward pass of 48 or 96 crops produces thousands of triplets, because the pairwise distances inside the batch are computed once and reused for every triplet. We choose K between 8 and 16: larger K gives more triplets per step, but each class then needs more distinct source photos in the batch (section 4).
+
+### 3.4 Which triplets inside the batch are used
+
+With the 48 x 48 distance matrix of the batch we can mark, for every anchor `a`, its positives (same class, a different crop) and its negatives (other classes), and then choose from these. The options, in the lecture's terms (deck 07, pages 9 and 10):
+
+| Strategy | Rule for the negative | Property |
+| --- | --- | --- |
+| All valid triplets | Every positive with every negative | Many easy triplets; the average loss is diluted by zeros |
+| Hardest negative | The negative closest to the anchor | Strongest signal, but a mislabelled or tiny crop is exactly such a negative, and early in training it can collapse the embedding |
+| Semi-hard | `d(a, p) < d(a, n) < d(a, p) + m` (FaceNet definition, Schroff et al. 2015) | Negative is farther than the positive but still inside the margin: informative and stable |
+| Distance-weighted | Sample negatives with probability inversely related to how crowded their distance is | Moderate distances, less noise-sensitive; optional |
+
+We use all valid triplets for a short warm-up so the network leaves its random start, and then **semi-hard negatives**: for every anchor-positive pair we choose a negative that satisfies the inequality above (picking one at random among the candidates, which adds variety). The batch loss is the average over the triplets with non-zero loss, so that the many zero-loss triplets do not shrink the gradient. If an anchor-positive pair has no semi-hard negative, we fall back to the least hard negative among the harder ones (the farthest negative that is still closer than the positive), and we skip the pair when all its negatives are already beyond the margin. This fallback is our own design choice.
+
+### 3.5 Rules for a valid triplet in this dataset
+
+A triplet is only valid for training when all of the following hold. Section 4 makes the first two hold by how the batch is built.
+
+1. `a`, `p` and `n` come from three different source photos, and no two of them belong to the same duplicate group. Otherwise the loss would push apart two copies of the same object, or pull together two crops of one photo that share a background rather than a material.
+2. The class of `n` differs from the class of `a`, using the cleaned labels.
+3. Each crop is at least 24 pixels on its short side. Smaller crops are excluded from the batches (section 4).
+
+### 3.6 One training step
+
+1. Draw a P x K batch with the rules of section 4.
+2. Crop, pad, resize and augment each member; pass the batch through the network and L2-normalise the 48 or 96 embeddings.
+3. Compute all pairwise distances in the batch.
+4. For each anchor-positive pair choose a negative (all triplets during warm-up, semi-hard afterwards).
+5. Average `max(0, d(a, p) - d(a, n) + m)` over the chosen triplets with non-zero loss.
+6. Update the network weights with the gradient of that average; repeat with a new batch.
