@@ -21,7 +21,7 @@ Waste of the same category can look very different (a crushed clear bottle and a
 The dataset is an object detection dataset: 10,464 images of 416 x 416 pixels with 74,073 labelled boxes (after removing 17 zero-area rows). We embed **object crops cut from the labelled boxes**, because a whole image has no single category:
 
 - Nearly half of the images (5,082) hold one object, but the median image holds 2 and the largest holds 358.
-- 10.2% of the images (1,066) contain more than one class. Glass appears together with metal in 531 images and with plastic in 226 images; no single label describes such an image.
+- 10.2% of the images (1,066) contain more than one class. Among the images with exactly two classes, the most common pairs are glass with metal (531 images) and glass with plastic (226 images); no single label describes such an image.
 - A crop has exactly one class, which is what the loss needs.
 
 ### 1.3 Dataset properties that drive the design
@@ -34,7 +34,7 @@ All numbers were computed on the cleaned labels (17 zero-area rows removed) and,
 | Image-level imbalance | Much milder: the number of training images that contain a class ranges from 1,024 (plastic) to 1,885 (glass). | Every class has enough distinct source images to build balanced batches without repeating a few photos. |
 | Crowded images | The top 1% of images (104) hold 21.2% of all crops, the top 5% hold 50.9%. These crowded images are mostly biodegradable (86% to 92% of their crops). | One photo must not supply many crops of a class to a batch or an epoch. Cap crops per image. |
 | Tiny objects | 36.45% of the boxes cover less than 1% of the image. The median crop is 45 pixels on its short side, and 11.4%, 24.1% and 35.3% of the crops are shorter than 16, 24 and 32 pixels. Biodegradable crops are the smallest (median 34 pixels). | Very small crops carry almost no visual signal and would act as label noise. Set a minimum crop size. |
-| Duplicated photos | The images look like a Roboflow export with flipped, rotated and re-cropped copies. Our own search found about 300 duplicate groups covering about 650 images (about 6%). | Two crops from the same source photo must never be treated as unrelated, and must not meet in one batch as a "negative". |
+| Duplicated photos | The images look like a Roboflow export with flipped, rotated and re-cropped copies. Our own search found about 300 duplicate groups covering about 650 images (about 6%). | Two copies of one photo contain the same objects, so they must not be treated as unrelated samples: as a positive a copy is trivial, and as a negative it would be a labelling error. |
 | Confusable materials | Glass, metal and plastic share shapes (bottles, cans); paper and cardboard overlap; glass-named images contain about 14% metal crops. | These pairs produce the hard negatives. They need care in mining. |
 
 Sections 2 to 6 use these facts to choose the loss (section 2), explain how samples are combined (section 3), design the sampling strategy (section 4), discuss its effect on training and on the embedding space (section 5), and state limits and alternatives (section 6).
@@ -75,11 +75,11 @@ This is why the sampling strategy decides whether anything is learned: if most s
 
 ### 2.3 The margin
 
-Because the embeddings lie on the unit sphere, distances lie between 0 and 2, and a margin must be achievable. Six classes whose centres are as far apart as possible (the corners of a regular simplex on the sphere) are at distance `sqrt(2 * 6 / 5) = 1.55`. The margin therefore has to be well below this, and also leave room for the spread inside each class. We start with `m = 0.2` and tune it on the validation split; published tuned runs of the triplet loss also found small margins (about 0.1) best. The margin controls the trade-off: too small and almost every triplet is already satisfied (no gradient, clusters stay close); too large and nearly all triplets stay active, so the loss never reaches zero and training pushes harder than the geometry allows.
+Because the embeddings lie on the unit sphere, distances lie between 0 and 2, and a margin must be achievable. Six classes whose centres are as far apart as possible (the corners of a regular simplex on the sphere) are at distance `sqrt(2 * 6 / 5) = 1.55`. The margin therefore has to be well below this, and also leave room for the spread inside each class. We start with `m = 0.2` and tune it on the validation split; published tuned runs of the triplet loss also found small margins (about 0.1) best (Musgrave et al., 2020). The margin controls the trade-off: too small and almost every triplet is already satisfied (no gradient, clusters stay close); too large and nearly all triplets stay active, so the loss never reaches zero and training pushes harder than the geometry allows.
 
 ### 2.4 Why the triplet loss for this dataset
 
-1. **It uses relative distances.** The lecture notes that metric learning is robust to class imbalance because it learns relative distances instead of absolute class distributions. The loss never asks "how many examples has this class", only "is the positive closer than the negative".
+1. **It uses relative distances.** The lecture (deck 07, page 4) notes that metric learning is robust to class imbalance because it learns relative distances instead of absolute class distributions. The loss never asks "how many examples has this class", only "is the positive closer than the negative".
 2. **Sampling controls the imbalance.** With 61% of all crops in one class, the imbalance cannot be removed by the loss alone; the triplet loss lets us fix it where it arises, in how anchors, positives and negatives are drawn (section 4).
 3. **It is transparent.** The margin and the three triplet cases can be explained and checked by hand, which matches the lecture (deck 07, pages 14 and 15: triplet loss, with the note that the sampling strategy is important).
 4. **The alternatives were considered.** The contrastive loss uses pairs and the same margin idea; Proxy-NCA and Proxy-Anchor replace sampled negatives with one learned vector per class and would also suit six classes; ArcFace is a classification loss with an angular margin. Section 6 explains why we keep the triplet loss and what we would change if we did not.
@@ -127,9 +127,9 @@ We use all valid triplets for a short warm-up so the network leaves its random s
 
 ### 3.5 Rules for a valid triplet in this dataset
 
-A triplet is only valid for training when all of the following hold. Section 4 makes the first two hold by how the batch is built.
+A triplet is only valid for training when all of the following hold. Section 4 makes the first and third hold by how the batch is built; the second holds by the definition of a negative.
 
-1. `a`, `p` and `n` come from three different source photos, and no two of them belong to the same duplicate group. Otherwise the loss would push apart two copies of the same object, or pull together two crops of one photo that share a background rather than a material.
+1. The anchor and the positive come from different source photos and from different duplicate groups. Otherwise the positive would be a copy of the anchor (or another crop of its photo with the same background), and the loss would be reduced by matching photos rather than materials. The negative must not belong to the anchor's duplicate group either, since a copy of the anchor's object cannot be a different class. A negative may come from the same photo as the anchor: a glass and a metal object on one table share a background, so only the material separates them, which is a useful and hard negative.
 2. The class of `n` differs from the class of `a`, using the cleaned labels.
 3. Each crop is at least 24 pixels on its short side. Smaller crops are excluded from the batches (section 4).
 
@@ -164,6 +164,8 @@ For each class in a batch we therefore proceed in this order:
 
 Choosing the image uniformly instead of the crop also removes the weight of crowded photos: the image-level imbalance is mild (1,024 to 1,885 training images per class, a factor of 1.8) while the crop-level imbalance is 10.3.
 
+The images for the different classes of a batch are chosen independently, so a negative may come from the same photo as an anchor of another class. This is allowed (section 3.5).
+
 ### 4.3 Class-balanced batches and a cap per image
 
 - **Every batch contains all six classes with K crops each** (P x K, section 3.3), so no batch is dominated by biodegradable.
@@ -176,7 +178,7 @@ How often a crop is seen follows from this. With equal class shares and the full
 
 The images look like a Roboflow export containing flipped, rotated and re-cropped copies of the same photo; our own search found about 300 duplicate groups (about 6% of the images). For the training samples this means:
 
-- two crops from one duplicate group are never in the same batch (4.2), so a copy cannot appear as another sample's negative or as a free positive;
+- two crops from one duplicate group are never chosen for the same class in a batch (4.2), so a copy cannot act as a free positive; if two copies were labelled differently, a copy could also appear as a false negative, which the group rule of 3.5 excludes;
 - the split into training, validation and test is made by duplicate group, as in the team's fixed split, so that no duplicate of a test or validation photo is trained on. Duplicates that our search missed remain possible and would make validation scores slightly optimistic.
 
 ### 4.5 Which negatives: warm-up, then semi-hard, with care for the confusable pairs
@@ -199,7 +201,7 @@ The pairs we expect to produce most hard negatives, and therefore monitor, are g
 | Batch | P = 6 classes x K = 8 (or 16) crops | 61% majority class; every class needs positives | K |
 | Sampling unit | Image first, one crop per image per batch | Crowded images; plastic draws 16 distinct photos only half the time | no |
 | Epoch cap | 10 crops per image per epoch, redrawn | Top 1% of images hold 21% of crops | 5, 10, 20 |
-| Duplicates | One crop per duplicate group per batch; split by group | About 300 groups | no |
+| Duplicates | At most one crop per duplicate group per class in a batch; split by group | About 300 groups | no |
 | Negatives | Warm-up on all triplets, then semi-hard | Label noise, tiny and truncated crops | warm-up length, margin |
 | Augmentation | Flip, scale, colour jitter | Rare-class crops are repeated | strength |
 
@@ -218,7 +220,7 @@ The loss only ever sees the triplets that the sampling produces. The same networ
 | Semi-hard negatives after a warm-up | Each triplet has a positive loss but a correct order, so the gradient is informative and bounded. Training is stable and every step teaches something. |
 | Class frequencies as they come (random batches) | 61% of the crops, and 83.5% of all triplets, have a biodegradable anchor. The updates are dominated by that class, and the rare classes are learned last and worst. |
 | Class-balanced P x K batches | Each class supplies K anchors, one sixth of the anchors in every step, so every class has an equal say in the update. |
-| Many crops from one image, or duplicates in one batch | Positives are too easy (same background, same lighting) and the loss can be reduced by matching photos rather than materials. A duplicate used as a negative produces a large loss for a pair that is in fact the same object, which is a wrong learning signal. |
+| Many crops from one image, or duplicates in one batch | Positives are too easy (same background, same lighting) and the loss can be reduced by matching photos rather than materials. If two copies carry different labels, a copy used as a negative gives a large loss for a pair that is in fact the same object, which is a wrong learning signal. |
 | One crop per image and per duplicate group | Positives come from different photos, so the network must find what the crops of one material have in common. |
 | A cap on crops per image | A few crowded photos cannot dominate an epoch. |
 | Repeating rare-class crops more often | Without augmentation the network can memorise them; with flips, scale changes and colour jitter, repetition is harmless. |
