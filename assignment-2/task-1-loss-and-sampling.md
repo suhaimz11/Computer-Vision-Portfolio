@@ -26,7 +26,7 @@ The dataset is an object detection dataset: 10,464 images of 416 x 416 pixels wi
 
 ### 1.3 Dataset properties that drive the design
 
-All numbers were computed on the cleaned labels (17 zero-area rows removed) and, where a split is mentioned, on the team's fixed group-aware split (train 7,325 / validation 1,570 / test 1,569 images).
+All numbers were computed on the cleaned labels (17 zero-area rows removed) and, where a split is mentioned, on the team's fixed split (train 7,325 / validation 1,570 / test 1,569 images). That split keeps together the duplicate groups confirmed in the team's own review; it does not yet include all groups from our wider duplicate search (section 4.4).
 
 | Property | Measured fact | Consequence for the loss and sampling |
 | --- | --- | --- |
@@ -179,7 +179,7 @@ How often a crop is seen follows from this. With equal class shares and the full
 The images look like a Roboflow export containing flipped, rotated and re-cropped copies of the same photo; our own search found about 300 duplicate groups (about 6% of the images). For the training samples this means:
 
 - two crops from one duplicate group are never chosen for the same class in a batch (4.2), so a copy cannot act as a free positive; if two copies were labelled differently, a copy could also appear as a false negative, which the group rule of 3.5 excludes;
-- the split into training, validation and test is made by duplicate group, as in the team's fixed split, so that no duplicate of a test or validation photo is trained on. Duplicates that our search missed remain possible and would make validation scores slightly optimistic.
+- the split into training, validation and test must be made by duplicate group, so that no copy of a validation or test photo is trained on. The team's current split does this only for the 267 groups confirmed in its own review of 364 candidate pairs. Our wider search found 307 groups (664 images), and 44 of them still cross the split; 23 of these contain a test image whose copy is in training or validation. A visual check judged about 19 of the 23 to be real copies (about 1.2% of the 1,569 test images). Before the embedding is trained or evaluated, the split therefore has to be rebuilt from the union of both duplicate lists, or those test images removed. Duplicates that neither search found can remain and would make validation and test scores slightly optimistic.
 
 ### 4.5 Which negatives: warm-up, then semi-hard, with care for the confusable pairs
 
@@ -201,7 +201,7 @@ The pairs we expect to produce most hard negatives, and therefore monitor, are g
 | Batch | P = 6 classes x K = 8 (or 16) crops | 61% majority class; every class needs positives | K |
 | Sampling unit | Image first, one crop per image per batch | Crowded images; plastic draws 16 distinct photos only half the time | no |
 | Epoch cap | 10 crops per image per epoch, redrawn | Top 1% of images hold 21% of crops | 5, 10, 20 |
-| Duplicates | At most one crop per duplicate group per class in a batch; split by group | About 300 groups | no |
+| Duplicates | At most one crop per duplicate group per class in a batch; split by the union of both duplicate lists | About 300 groups; 44 cross the current split | no |
 | Negatives | Warm-up on all triplets, then semi-hard | Label noise, tiny and truncated crops | warm-up length, margin |
 | Augmentation | Flip, scale, colour jitter | Rare-class crops are repeated | strength |
 
@@ -264,7 +264,7 @@ Positives are chosen at random among the other K - 1 crops of the class, not as 
 - **Nothing is trained.** The effects in section 5 are expectations from the theory and from published studies. The numerical settings (24 pixels, 10 crops per image, K = 8 or 16, margin 0.2, the warm-up length) are design choices, and each would be tuned on the validation split, never on the test split.
 - **Labels.** The class names are inferred from the file names, and paper and cardboard are labelled inconsistently. Semi-hard mining reduces the damage of noisy labels but does not remove it.
 - **Small and truncated objects.** Crops below 24 pixels are not trained on, and boxes at the image border or inside other boxes show only part of an object. Embeddings of such crops will be less reliable, so results should be reported by crop size.
-- **Duplicates.** The duplicate groups come from our own search, which is not guaranteed to be complete (on planted copies it recovered about 93%). Missed duplicates would make validation scores slightly optimistic.
+- **Duplicates.** The team's current split leaves 44 of our 307 duplicate groups across training, validation and test (section 4.4), which must be corrected before any evaluation. Our search itself is not guaranteed to be complete: in our own test with planted copies, its automatic stage found about 93% of them. Missed duplicates would make validation and test scores slightly optimistic.
 - **Background shortcuts.** Many images come from similar stock-photo settings; the network may use a background (for example a white table behind a transparent bottle) instead of the material. Distinct photos for the positives and augmentation reduce, but do not remove, this risk.
 - **Sensitivity of the loss.** The triplet loss depends more on its sampling than the alternatives below. In a large comparison with tuned hyperparameters, classification-style and proxy-based losses were at or a few points above the triplet-based losses (Musgrave et al., 2020), so the choice here rests on fit with the task and transparency, not on a leaderboard gap.
 - **Closed set.** All six classes are seen in training. The design does not tell how well the space generalises to a material that was not in the training data.
