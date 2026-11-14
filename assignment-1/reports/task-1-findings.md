@@ -1,5 +1,10 @@
 # Task 1: Dataset analysis and training pipeline
 
+Status update (2026-11-12): the 60-epoch baseline has completed. The
+[training review](training-review.md) records verified validation results,
+Task 1 requirement checks and proposed improvement experiments. Training-status
+notes below are the historical pipeline and diagnostic record.
+
 ## Audit results
 
 - 10,464 images, all 416 x 416 pixels. All opened successfully.
@@ -179,7 +184,7 @@ The implementation is [train_detector.py](../train_detector.py).
 | Setting | Initial value | Reason |
 | --- | --- | --- |
 | Initialization | COCO-pretrained YOLO26s; fine-tune all layers | Transfer learned visual features |
-| Maximum epochs | 100 | Upper training budget, not a required duration |
+| Maximum epochs | 50 | Upper training budget, not a required duration |
 | Early stopping | Patience 20 | Stop after sustained lack of validation fitness improvement |
 | Batch size | 4 | Conservative starting point for 8 GB VRAM; reduce to 2 if necessary |
 | GPU / mixed precision | Device 0 / AMP enabled | Use available GPU while limiting memory demand |
