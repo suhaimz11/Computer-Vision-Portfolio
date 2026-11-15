@@ -1,0 +1,10 @@
+YOLOv5  cb2f17f Python-3.14.4 torch-2.11.0+cu128 CUDA:0 (NVIDIA GeForce RTX 5050 Laptop GPU, 8151MiB)
+                   all       1569      11098      0.677      0.489       0.55      0.365
+         biodegradable       1569       6805      0.706      0.439      0.515      0.278
+             cardboard       1569        703      0.648      0.474      0.543      0.375
+                 glass       1569       1165      0.773      0.587      0.651       0.46
+                 metal       1569        875      0.689       0.57      0.608       0.41
+                 paper       1569        658      0.598      0.457      0.494      0.365
+               plastic       1569        892      0.649      0.405      0.487      0.304
+Speed: 0.5ms pre-process, 8.7ms inference, 12.9ms NMS per image at shape (4, 3, 640, 640)
+Results saved to [1mC:\Users\suhai\Desktop\computer-vision-portfolio\assignment-1\yolov5\runs\task2_test[0m

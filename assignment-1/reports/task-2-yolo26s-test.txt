@@ -1,0 +1,10 @@
+YOLO26s summary (fused): 120 layers, 9,467,502 parameters, 0 gradients, 20.8 GFLOPs
+                   all       1569      11098      0.749      0.546      0.619      0.445
+         biodegradable        343       6805      0.819      0.435      0.569      0.314
+             cardboard        225        703      0.632       0.54      0.579      0.429
+                 glass        398       1165      0.852      0.646      0.715       0.55
+                 metal        285        875      0.784       0.61      0.684       0.51
+                 paper        265        658      0.683      0.561      0.613      0.492
+               plastic        220        892      0.724      0.485      0.554      0.377
+Speed: 0.8ms preprocess, 26.3ms inference, 0.0ms loss, 5.9ms postprocess per image
+Results saved to [1mC:\Users\suhai\Desktop\computer-vision-portfolio\runs\detect\assignment-1\runs\detect\task2_yolo26s_test[0m
