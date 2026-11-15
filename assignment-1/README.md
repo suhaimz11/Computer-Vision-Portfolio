@@ -4,7 +4,10 @@ The dataset audit, visual review and duplicate pair review are complete.
 The complete [Task 1 report](reports/task-1-findings.md) documents the analysis,
 cleaning, verified split/export and selected YOLO26s training pipeline.
 The reproducible split workflow verifies cleaned labels before assigning data.
-Model training has begun; final evaluation is pending.
+The 60-epoch baseline is complete. Best logged validation mAP50 is 62.35% and
+mAP50-95 is 44.20% (epoch 57). See the [training review](reports/training-review.md)
+for the Task 1 assessment and runnable improvement experiments. Historical
+diagnostic notes below describe earlier runs; final test evaluation is pending.
 
 ## Setup
 
@@ -130,7 +133,7 @@ Then inspect the augmented training batch plots before the baseline:
 python train_detector.py
 ```
 
-Baseline: 100 epochs maximum, patience 20, seed 42, 640-pixel inputs, batch 4,
+Baseline: 60 epochs maximum, patience 20, seed 42, 640-pixel inputs, batch 4,
 GPU 0, AMP enabled and two Windows data workers. The RTX 5050 has 8 GB VRAM;
 reduce batch to 2 if crowded scenes exhaust memory. Training speed and peak
 memory have not yet been measured. Compare 416 using validation if needed;

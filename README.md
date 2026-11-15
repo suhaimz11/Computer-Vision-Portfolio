@@ -5,8 +5,8 @@ Computer vision assignments, implementation code, analysis, and results.
 ## Assignments
 
 - [Assignment 1: Waste Object Detection](assignment-1/README.md): read-only dataset
-  audit, measured findings, tests, and a proposed training pipeline. Training has
-  not started.
+  audit, measured findings, tests, and a completed 60-epoch baseline. See the
+  [training review](assignment-1/reports/training-review.md) for results and next experiments.
 - `assignment-2/`: reserved for the theoretical deep metric learning assignment.
 
 ## Dataset
