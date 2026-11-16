@@ -127,8 +127,7 @@ All three are crowded or unusual scenes with 11-18 annotated objects.
 - Results depend on annotation quality: only a sample of 30 images was visually
   reviewed, and incomplete or inconsistent labels appear as false alarms and
   misses.
-- Near-duplicate images that were not detected may remain in the data, and
-  duplicates kept inside the same subset can give some sources extra weight.
+-Possible duplicate leakage: the team's wider duplicate search (Assignment 2, Task 1, section 4.4) found 44 of its 307 duplicate groups still crossing the train/validation/test split; about 19 of them were judged real copies of a test image (about 1.2% of the 1,569 test images). The test scores may therefore be slightly optimistic. Duplicates found by neither search can also remain, and duplicates kept inside the same subset can give some sources extra weight.
 - One model on one split; no confidence intervals were computed.
 - The figures show 9 selected examples, not a random sample.
 
