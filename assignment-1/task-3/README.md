@@ -99,7 +99,7 @@ predictions that overlap a dataset box at IoU >= 0.5 but have a different class.
 
 ![Wrong-class prediction](results/predictions/incorrect/glass956_jpg.rf.3b34a1b57d414600ad580491ae64446b.jpg)
 
-Four objects annotated as glass are predicted as metal, with confidence 0.81–0.91. Their reflective appearance makes the material visually ambiguous, so the annotation should also be checked.
+Four objects annotated as glass are predicted as metal, with confidence 0.81â€“0.91. Their reflective appearance makes the material visually ambiguous, so the annotation should also be checked.
 
 ![Wrong-class prediction](results/predictions/incorrect/paper1160_jpg.rf.cdce4a52a1a3fe24ead81115c614c72b.jpg)
 
