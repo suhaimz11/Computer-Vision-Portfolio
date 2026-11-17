@@ -1,5 +1,20 @@
 # Task 1: Dataset analysis and training pipeline
 
+## From data findings to design decisions
+
+| Finding (measured) | Consequence for the pipeline | Where |
+| --- | --- | --- |
+| Biodegradable has 61.3% of the 74,073 boxes; 10.3 times more boxes than the smallest class in training | Split balanced per class (image presence and box counts); per-class AP always reported; no oversampling until validation shows a need | [Split](#reproducible-trainvalidationtest-split), [Task 2](../task-2/README.md) |
+| 1 to 358 objects per image; 5,082 images hold one object, while the 5% most crowded images hold about half of all boxes | Detection cap `max_det=400` (checked: raising it to 500 changes test mAP50–95 by 0.03 points); results reported by crowding | [Parameters](#training-parameters-and-strategy), [Task 3](../task-3/README.md) |
+| 36.45% of boxes cover under 1% of the image | 640-pixel input instead of the native 416; mild scaling (0.2); mosaic, mixup and copy-paste off so small objects are not shrunk further | [Preprocessing](#selected-detector-and-preprocessing), [augmentation](#training-only-augmentation) |
+| Flipped, rotated, cropped and recoloured copies of photos (364 candidate pairs reviewed, 267 groups) | Group-aware split keeps confirmed copies in one subset; remaining copies found later were measured (test mAP50–95 44.5% with, 44.7% without) | [Duplicates](#duplicate-review-and-leakage-prevention) |
+| 17 zero-area boxes | Removed, logged and verified; every other box kept | [Cleaning](#annotation-cleaning) |
+| All images are 416 x 416 and decode correctly; no exact duplicates | Same letterbox preprocessing for every split; no image dropped | [Audit](#audit-results) |
+| File-name class differs from the labels in 133 images | Labels, not file names, are the ground truth; class names confirmed by the export's `data.yaml` | [File names](#file-names-versus-labels) |
+| 220 to 398 test images per class | Test used once, after all choices were made on validation; 95% confidence intervals reported | [Evaluation design](#model-selection-and-evaluation-design) |
+| Training hardware: one 8 GB RTX 5050 laptop GPU | Small model (YOLO26s), batch 4, mixed precision | [Parameters](#training-parameters-and-strategy) |
+
+
 
 ## Task 1 files
 
@@ -34,7 +49,7 @@ notes below are the historical pipeline and diagnostic record.
 
 ## Class distribution
 
-| ID | Working class name | Valid boxes | Images containing class |
+| ID | Class name | Valid boxes | Images containing class |
 | --- | --- | ---: | ---: |
 | 0 | biodegradable | 45,395 | 2,287 |
 | 1 | cardboard | 4,696 | 1,502 |
@@ -214,7 +229,7 @@ are excluded from Git; code, review decisions and split manifests are versioned.
 The selected baseline is **COCO-pretrained YOLO26s (`yolo26s.pt`)**, fine-tuned
 using the Ultralytics Python API. It is a practical small-model starting point
 for the available Intel i7 / NVIDIA RTX 5050 system with 8 GB GPU memory.
-The model's performance on this waste dataset has not yet been measured.
+Its test results are in [Task 2](../task-2/README.md) (mAP50–95 44.5%).
 
 The initial input size is 640 pixels. The loader applies aspect-ratio-preserving
 resize/letterbox and scales RGB intensities to [0, 1]; no separate dataset
@@ -247,7 +262,7 @@ The implementation is [train_detector.py](../train_detector.py).
 | Setting | Initial value | Reason |
 | --- | --- | --- |
 | Initialization | COCO-pretrained YOLO26s; fine-tune all layers | Transfer learned visual features |
-| Maximum epochs | 50 | Upper training budget, not a required duration |
+| Maximum epochs | 60 | Upper training budget, not a required duration (the run used all 60; best epoch 57) |
 | Early stopping | Patience 20 | Stop after sustained lack of validation fitness improvement |
 | Batch size | 4 | Conservative starting point for 8 GB VRAM; reduce to 2 if necessary |
 | GPU / mixed precision | Device 0 / AMP enabled | Use available GPU while limiting memory demand |
@@ -284,7 +299,8 @@ test subset. Report mAP50-95, mAP50, per-class AP, precision and recall. Per-cla
 results are needed because aggregate scores can obscure minority-class failures.
 Review small objects, overlaps and crowded scenes. Subsequent assignment tasks
 will include examples of correct, missed and incorrect detections and analysis
-of plausible failure causes. No test-set results are available yet.
+of plausible failure causes. The test results are reported in
+[Task 2](../task-2/README.md) and analysed in [Task 3](../task-3/README.md).
 
 ## Reproduction and implementation evidence
 
