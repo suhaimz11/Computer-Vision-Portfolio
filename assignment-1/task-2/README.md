@@ -51,6 +51,19 @@ inspecting box localization and missed detections in Task 3. Plastic also
 scored relatively low. YOLO26s was selected on validation and remains the
 model to use for the final error analysis.
 
+## Detection limit for crowded images
+
+The densest test image has 320 annotated objects (validation: 311), above
+Ultralytics' default limit of 300 detections. YOLO26 also offers an
+NMS-free end-to-end head, which could cap the output. We checked both on the
+submitted checkpoint with Ultralytics 8.4.208: the checkpoint uses the
+standard head with NMS, the number of returned boxes follows `max_det`
+(300, 400 or 1,000 boxes on the densest image), and both heads give
+identical test results. Raising the limit from 400 to 500 changes test
+mAP50–95 from 44.51% to 44.54% (mAP50 61.92% to 62.01%), so the 400 limit
+does not hold the model back. Only one test image (and one validation
+image) has more than 300 objects.
+
 ## Uncertainty of the test scores
 
 The test split is one sample of 1,569 images, so every score above has
