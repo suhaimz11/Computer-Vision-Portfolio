@@ -109,6 +109,45 @@ Two objects annotated as paper in the takeaway-cup image are predicted as metal,
 
 Two objects annotated as plastic are predicted as glass, with confidence 0.54 and 0.25. Transparent packaging can make these materials difficult to distinguish.
 
+## Where the model succeeds and fails
+
+To test the explanations below with numbers, the test predictions (same
+model, threshold 0.25 and matching rule) were split three ways
+([breakdowns.py](breakdowns.py), [table](results/metrics/breakdowns_test.csv)).
+Recall is the share of objects found with the right class; precision is the
+share of predictions that are correct.
+
+![Recall and precision by object size, crowding and image type](results/breakdowns_test.png)
+
+| Breakdown | Group | Images | Objects | Recall | Precision |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Object size | small (< 32 x 32 px) | | 3,002 | 26.0% | 61.8% |
+| | medium | | 4,347 | 53.3% | 68.1% |
+| | large (>= 96 x 96 px) | | 3,749 | 74.4% | 80.6% |
+| Objects per image | 1 | 763 | 763 | 91.3% | 78.5% |
+| | 2–5 | 447 | 1,257 | 73.8% | 77.4% |
+| | 6–20 | 242 | 2,462 | 63.4% | 71.4% |
+| | more than 20 | 117 | 6,616 | 40.8% | 70.1% |
+| Image type | white background (product photo) | 539 | 1,753 | 71.2% | 78.7% |
+| | scene | 1,030 | 9,345 | 49.6% | 70.9% |
+
+- **Size is the strongest factor.** Only a quarter of small objects are found,
+  against three quarters of large ones. Precision falls less (62% vs 81%):
+  small objects are mostly missed, not mistaken.
+- **Crowding comes next.** A single object is found 91% of the time; in
+  images with more than 20 objects, 41%. Those 117 images hold 60% of all test
+  objects, which is why overall recall is only about 55%.
+- **Image type matters less than it first appears.** Scenes look much harder
+  (50% vs 71% recall), but they are also far more crowded. At the same
+  crowding level the gap shrinks to 4–12 points (single object: 94% vs 90%;
+  6–20 objects: 73% vs 60%), so clutter explains most of it and the background
+  only the rest.
+
+Sizes use COCO area bins on the 416-pixel source images. An image counts as
+a white-background photo when at least 80% of a thin border strip is
+near-white. Computed on an Apple M4 Pro GPU: totals match the CUDA run above
+to within 2 objects and 15 false alarms.
+
 ## Analysis of the errors
 
 1. **Missed objects are the dominant error, not class confusion.** 4,996
