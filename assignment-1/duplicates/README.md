@@ -12,6 +12,24 @@ check_duplicates.py runs extraction, strict matching, strict verification, loose
 matching and loose verification. Matching logic and thresholds follow the supplied
 scripts. Local paths and subprocess startup support Windows.
 
+## What each stage does
+
+The stage files keep the teammate's short names; renaming them would break the
+launcher and earlier run folders. All stages run inside one results folder.
+
+| Stage | Script | Method | Reads | Writes |
+| --- | --- | --- | --- | --- |
+| 1 | `c1_extract.py` | Up to 200 SIFT keypoints per image, RootSIFT descriptors, also for the mirrored image (to catch flipped copies) | `GarbageDataset/images/` | `sift.pkl` |
+| 2 | `c2_match.py` | Approximate nearest-neighbour search (FLANN) over all descriptors with Lowe's ratio test 0.8; an image pair is a candidate with at least **6** matching keypoints (strict) | `sift.pkl` | `cand.pkl` |
+| 3 | `c3b_verify.py` | Brute-force matching of each candidate pair, ratio test, keypoints within 45 px of the border ignored, RANSAC similarity transform (`estimateAffinePartial2D`, 4 px tolerance); score = inliers, set to 0 if they cover less than 12% of the image | `sift.pkl`, `cand.pkl` | `verified2.csv` |
+| 4 | `c4_match_loose.py` | As stage 2 with at least **3** matching keypoints (loose), so more candidates | `sift.pkl` | `cand3.pkl` |
+| 5 | `c5_verify_loose.py` | As stage 3 on the loose candidates | `sift.pkl`, `cand3.pkl` | `verified3.csv` |
+| review | `preview_duplicates.py` | Side-by-side previews of every loose pair with at least 15 inliers for manual review | `verified3.csv` | `reports/duplicate-review/` (364 pairs, decisions in `review.csv`) |
+
+`_paths.py` holds the dataset path and loads the supplied reference labels.
+The CSV columns are the two image indices, keypoint votes, verified inliers,
+estimated scale, whether the mirrored image matched, and the reference status.
+
 Images must be 416x416 in GarbageDataset/images/. A fresh numbered folder under
 reports/team-duplicates-run/ holds stage outputs. verified2.csv is the strict
 search; verified3.csv is the loose search. These are scores, not final verdicts.
