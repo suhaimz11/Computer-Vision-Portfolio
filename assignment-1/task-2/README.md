@@ -17,10 +17,10 @@ AdamW refinement reached 43.7% validation mAP50–95, so the original SGD
 checkpoint was retained. YOLO26s led YOLOv5s by 8.48 percentage points
 in validation mAP50–95.
 
-Checkpoint sources relative to Assignment 1:
+Both selected checkpoints are submitted in [`assignment-1/models/`](../models/README.md) with their SHA-256 checksums:
 
-- YOLO26s: `runs/train/yolo26s_baseline-2/weights/best.pt`.
-- YOLOv5s: `yolov5/runs/yolov5s_20261113_135834_037492/weights/best.pt`.
+- YOLO26s: `models/yolo26s-best.pt` (training run `yolo26s_baseline-2`).
+- YOLOv5s: `models/yolov5s-best.pt` (training run `yolov5s_20261113_135834_037492`).
 
 ## Held-out test results
 

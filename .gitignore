@@ -270,3 +270,6 @@ assignment-1/reports/team-duplicates-run*/
 assignment-1/reports/manual-group-review/
 # Local analysis and evaluation reruns
 /runs/
+
+# Delivered final checkpoints (the only weights kept in git)
+!assignment-1/models/*.pt
