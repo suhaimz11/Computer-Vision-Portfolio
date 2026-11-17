@@ -17,6 +17,10 @@ Reverification in this review:
 - Regenerating the split in a separate temporary directory produced a byte-identical
   manifest. Counts remain 7,325 train / 1,570 validation / 1,569 test.
 - Reviewed duplicate decisions produce 267 non-singleton groups, isolated by split.
+  Duplicates found only by the wider search are not isolated: 44 groups cross the
+  split (23 test images with a copy in training or validation, 26 validation
+  images with a copy in training). Removing the 23
+  test images changes test mAP50–95 from 44.5% to 44.7% (see the [Task 2 report](README.md#test-score-without-leaked-duplicates)).
 
 Remaining documentation gaps: official class-name mapping, clear individual group
 contributions, and outdated statements that training is unfinished. The dataset link
