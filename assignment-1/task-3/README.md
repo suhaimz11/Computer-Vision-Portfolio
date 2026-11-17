@@ -207,6 +207,18 @@ this was not checked image by image. Counts are from the Apple M4 Pro re-run
    whose appearance is dominated by a different material (a can with a paper
    label).
 
+   **Lids and caps are a likely source of glass–metal confusion.** Glass photos
+   often show a jar or bottle whose metal lid or cap is labelled as a separate
+   metal object: 574 of the 2,649 glass-named images contain both glass and
+   metal boxes, and 13.7% of all boxes in glass photos are metal. These metal
+   boxes are small (median 38 px, against 116 px for metal objects in metal
+   photos), and in the examples below they sit directly on the glass object.
+   All six random examples (glass images with at most 8 boxes; blue = glass,
+   red = metal) are lids or caps. Whether the 17 test glass→metal confusions
+   are caps was not checked one by one.
+
+   ![Glass jars and bottles with their metal lids and caps labelled separately](results/glass_lids_caps.jpg)
+
 ## Limitations of the final model
 
 - Limited recall (about 55%): nearly half of the objects in crowded scenes are

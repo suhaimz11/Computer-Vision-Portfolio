@@ -43,6 +43,11 @@ postprocessing settings. Scores use the precision printed by the evaluators.
 | Paper | 658 | 61.3% | 49.2% | 49.4% | 36.5% |
 | Plastic | 892 | 55.4% | 37.7% | 48.7% | 30.4% |
 
+Validation and test agree closely for YOLO26s (mAP50–95 44.2% and 44.5%,
+mAP50 62.35% and 61.9%). The model generalises to unseen images, and the
+test split is neither easier nor harder than the validation split it was
+selected on.
+
 YOLO26s led by 8.0 percentage points in test mAP50–95 and achieved
 higher AP50–95 in all six classes. Glass was strongest for both models.
 Biodegradable waste had the lowest AP50–95 in both despite having the
