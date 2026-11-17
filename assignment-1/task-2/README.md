@@ -51,6 +51,59 @@ inspecting box localization and missed detections in Task 3. Plastic also
 scored relatively low. YOLO26s was selected on validation and remains the
 model to use for the final error analysis.
 
+## Uncertainty of the test scores
+
+The test split is one sample of 1,569 images, so every score above has
+sampling error. We estimated 95% confidence intervals for YOLO26s by a
+bootstrap over test images: draw 1,569 images with replacement, recompute
+the metrics with the Ultralytics evaluator's own matching and AP code,
+repeat 1,000 times (seed 42), and take the 2.5th and 97.5th percentiles.
+Whole images are resampled, not boxes, because objects in one photo share
+lighting, background and crowding.
+
+| YOLO26s on test | Value | 95% interval |
+| --- | ---: | --- |
+| Precision | 74.8% | 72.2% – 77.6% |
+| Recall | 54.6% | 51.2% – 59.4% |
+| mAP50 | 61.9% | 58.7% – 66.7% |
+| **mAP50–95** | **44.5%** | **41.6% – 48.8%** |
+
+| Class | AP50–95 | 95% interval | Test images with the class |
+| --- | ---: | --- | ---: |
+| Biodegradable | 31.4% | 27.3% – 35.9% | 343 |
+| Cardboard | 42.8% | 35.3% – 52.4% | 225 |
+| Glass | 55.0% | 43.7% – 68.1% | 398 |
+| Metal | 50.8% | 41.4% – 60.2% | 285 |
+| Paper | 49.3% | 41.1% – 59.2% | 265 |
+| Plastic | 37.7% | 30.2% – 48.2% | 220 |
+
+How to read this:
+
+- **The overall score is fairly precise:** 2.9 points below to 4.3 points above
+  the estimate. The interval is wider upwards, which fits a test set where a
+  minority of crowded images holds most of the boxes and pulls the score down.
+- **Per-class intervals are wide** (8 to 25 points). Classes whose intervals
+  overlap, for example glass, metal and paper, cannot be ranked reliably from
+  this test set. The one clear ranking is that **biodegradable is the weakest
+  class**: its whole interval lies below every other class's point estimate.
+  Glass has the highest point estimate, but its interval overlaps metal and paper.
+- **YOLO26s vs YOLOv5s:** the YOLOv5s score of 36.5% lies well below the lower
+  end of the YOLO26s interval (41.6%), so the 8-point gap is not a sampling
+  accident. A paired bootstrap of the difference was not run, because the
+  YOLOv5 v7.0 checkpoint needs the original YOLOv5 code base.
+- **Leaked duplicates:** the clean-test score of 44.7% (next section) lies well
+  inside the interval, consistent with the duplicates having no measurable effect.
+
+Reproduce (all values in [test-confidence-intervals.json](test-confidence-intervals.json)):
+
+```powershell
+python assignment-1/task-2/bootstrap_test_ci.py --device 0
+```
+
+The script first checks that its recomputed mAP50–95 equals the evaluator's
+value on the full test split before resampling. Computed on an Apple M4 Pro
+GPU; per-class point values are from that re-run (see the next section).
+
 ## Test score without leaked duplicates
 
 The split keeps the 267 duplicate groups confirmed in our pair review
