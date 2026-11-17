@@ -148,6 +148,39 @@ a white-background photo when at least 80% of a thin border strip is
 near-white. Computed on an Apple M4 Pro GPU: totals match the CUDA run above
 to within 2 objects and 15 false alarms.
 
+## What the false alarms and misses really are
+
+"False alarm" and "missed" above are strict: a box counts only with IoU of at
+least 0.5. [error_types.py](error_types.py) keeps that matching and explains
+each leftover prediction and object by the box it overlaps most
+([table per class](results/metrics/error_types_test.csv)).
+
+| Error | Type | Count | Share | Meaning |
+| --- | --- | ---: | ---: | --- |
+| False alarm | imprecise box | 1,242 | 61% | right class on a real object, but IoU 0.1–0.5 (box too loose or too tight) |
+| | background | 529 | 26% | IoU below 0.1 with every annotated object |
+| | duplicate | 191 | 9% | a second box on an object that was already found |
+| | other class | 68 | 3% | partly overlaps an object of another class |
+| Missed object | not detected | 3,311 | 66% | no right-class box anywhere near it |
+| | nearly found | 1,687 | 34% | a right-class box overlaps it, but only with IoU 0.1–0.5 |
+
+- **Most false alarms are localisation errors, not phantom objects.** 61% sit
+  on a real object of the right class with a box that is not tight enough;
+  only about a quarter fire on unannotated background. Biodegradable accounts
+  for 641 of the 1,242 imprecise boxes, which supports the explanation that
+  its irregular, overlapping objects have unclear boundaries.
+- **A third of the missed objects were nearly found.** For 1,687 objects the
+  model put a box of the right class on them but missed the 0.5 overlap. Better
+  localisation (or a looser IoU criterion) would recover many of these; the
+  other two thirds need better detection, mainly of small objects in piles.
+- **Cardboard's high false-alarm count** (343 for 703 objects) is mostly
+  imprecise boxes (212), consistent with piles where individual boxes are
+  hard to delimit.
+
+Background false alarms may also include objects the annotators did not label;
+this was not checked image by image. Counts are from the Apple M4 Pro re-run
+(2,030 false alarms and 4,998 missed objects, against 2,045 and 4,996 above).
+
 ## Analysis of the errors
 
 1. **Missed objects are the dominant error, not class confusion.** 4,996
