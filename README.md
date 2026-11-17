@@ -34,6 +34,6 @@ Both tasks are theoretical.
 
 ## Local setup and submission
 
-The dataset, virtual environment, and model weights are stored locally. See the [Assignment 1 setup](assignment-1/README.md#setup) for dataset placement and dependencies. Run the local tests from the repository root with `python -m unittest discover -s assignment-1/tests -v`.
+The trained checkpoints are in [`assignment-1/models/`](assignment-1/models/README.md) (final model: YOLO26s). The dataset and virtual environment are stored locally. See the [Assignment 1 setup](assignment-1/README.md#setup) for dataset placement and dependencies. Run the local tests from the repository root with `python -m unittest discover -s assignment-1/tests -v`.
 
-The submission also requires the trained checkpoint, a short presentation covering both assignments, and a statement identifying each group member's contribution.
+The submission also requires a short presentation covering both assignments, and a statement identifying each group member's contribution.

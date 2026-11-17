@@ -17,8 +17,8 @@ A ground-truth object with no matching prediction is **missed**.
 Colour code in the figures: green = ground truth, blue = correct,
 red = wrong class, orange = false alarm, yellow = missed ground truth.
 
-Run from the repository root after preparing the dataset and saving the
-YOLO26s checkpoint at `assignment-1/runs/train/yolo26s_baseline-2/weights/best.pt`.
+Run from the repository root after preparing the dataset. The script loads the
+submitted YOLO26s checkpoint, [`assignment-1/models/yolo26s-best.pt`](../models/README.md), by default.
 
 ```powershell
 python assignment-1/task-3/error_analysis.py
