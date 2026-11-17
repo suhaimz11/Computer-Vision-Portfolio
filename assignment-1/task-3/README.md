@@ -14,6 +14,16 @@ confidence). Each prediction is then one of:
 
 A ground-truth object with no matching prediction is **missed**.
 
+**Why confidence 0.25.** The threshold was chosen on the validation split,
+not on test: [select_threshold.py](select_threshold.py) predicts the 1,570
+validation images once and scores thresholds from 0.05 to 0.90 with the same
+matching rule as below. F1 is highest at 0.25 (precision 72.4%, recall 54.7%,
+F1 62.3%) and nearly flat around it (61.9% at 0.20, 61.7% at 0.30); lower
+thresholds add many false alarms, higher ones lose many objects
+([full sweep](results/metrics/threshold_selection_val.csv)). The test split was
+then analysed once at that threshold. The mAP values in Task 2 do not depend on
+this threshold.
+
 Colour code in the figures: green = ground truth, blue = correct,
 red = wrong class, orange = false alarm, yellow = missed ground truth.
 
