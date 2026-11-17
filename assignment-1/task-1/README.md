@@ -58,6 +58,39 @@ watermarks. The review covers box placement in these examples; it does not
 confirm every class label or establish that all objects have been annotated.
 Invalid rows were not drawn in the previews.
 
+## File names versus labels
+
+Every file name starts with a class word (`glass349_jpg...`). In 133 of the
+10,464 images (1.3%) the most frequent label class differs from that word;
+39 of them contain no box of the file-name class at all. They are spread over
+the splits (train 91, validation 22, test 20) and listed in
+[name-label-mismatches.csv](../reports/name-label-mismatches.csv)
+([check_name_label_mismatch.py](../check_name_label_mismatch.py)).
+The most common pairs are paper filed, cardboard labelled (21), glass filed
+with mainly biodegradable (20), metal (18) or plastic (18) boxes, and
+cardboard filed, paper labelled (12).
+
+![Four test images without any box of their file-name class](../reports/name-label-mismatch-examples.jpg)
+
+Four test images from the 39, with their annotated boxes:
+
+- **biodegradable1354:** paper tags and crumpled paper, labelled paper. The
+  labels fit the picture; the file name does not.
+- **metal192:** two cork-covered pencil holders. The holders are not labelled;
+  instead 14 tiny biodegradable boxes sit on pencil tips. This is a genuine
+  annotation problem.
+- **paper271:** a flattened tissue box labelled cardboard: the fuzzy boundary
+  between paper and cardboard.
+- **plastic844:** a cardboard sleeve of a yoghurt multipack labelled
+  cardboard; the plastic cups inside are not labelled.
+
+So the file-name class is not a reliable ground truth, and the labels, not
+the names, are used everywhere in this project. Most mismatches are plausible
+labels on mixed or borderline images; a few, such as metal192, are real
+annotation errors. They were kept unchanged, because a full relabelling
+review was out of scope, and they are one reason for the paper/cardboard and
+glass/metal/plastic confusions reported in Task 3.
+
 ## Duplicate review and leakage prevention
 
 The SIFT/RootSIFT loose search produced 364 unique candidate pairs with at least
