@@ -64,4 +64,13 @@ then `python -m pip install -r assignment-1/requirements-audit.txt ultralytics==
 
 The trained checkpoints are in [`assignment-1/models/`](assignment-1/models/README.md) (final model: YOLO26s). The dataset and virtual environment are stored locally. See the [Assignment 1 setup](assignment-1/README.md#setup) for dataset placement and dependencies. Run the local tests from the repository root with `python -m unittest discover -s assignment-1/tests -v`.
 
-The submission also requires a short presentation covering both assignments, and a statement identifying each group member's contribution.
+The submission also requires a short presentation covering both assignments.
+
+## Contribution statement
+
+| Member | Primary responsibility | Main contributions |
+| --- | --- | --- |
+| Pavin Sumathi Palanichamy | Assignment 2, Task 1: loss function and sampling strategy | Chose and justified the triplet loss with a margin on L2-normalised crop embeddings; designed the online, class-balanced 6 x K batch sampling, the image-first crop drawing, the 24-pixel minimum crop size, the duplicate-aware triplet rules and the warm-up plus semi-hard negative mining; analysed the dataset properties behind each choice and discussed how sampling shapes training and the embedding space ([Task 1](assignment-2/task-1/README.md)). Also contributed to Assignment 1: the leakage audit and leak-free test score, confidence intervals, validation-based threshold selection, error breakdowns, the augmentation check, the reproduction guide and submitting the trained models. |
+| Prethebha Muthukumaran | Assignment 2, Task 2: analysis and use of the learned embedding space | Designed the retrieval of similar waste objects from detector crops, the class-balanced k-nearest-neighbour assignment of unknown samples with "unknown" and "uncertain" answers, the visualisation and structural analysis of the space (PCA, t-SNE, distance and confusion matrices, silhouette), and the quantitative evaluation (Recall@K, MAP@R, macro-F1, chance levels, breakdowns and bootstrap intervals) ([Task 2](assignment-2/task-2/README.md)). Reviewed and merged the Assignment 2 Task 1 pull request. |
+
+The remaining members' rows will be added before submission.
