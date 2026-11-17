@@ -51,6 +51,55 @@ inspecting box localization and missed detections in Task 3. Plastic also
 scored relatively low. YOLO26s was selected on validation and remains the
 model to use for the final error analysis.
 
+## Test score without leaked duplicates
+
+The split keeps the 267 duplicate groups confirmed in our pair review
+together. A wider duplicate search (Assignment 2, Task 1, section 4.4) found
+44 more groups that cross train, validation and test: 23 test images
+(166 boxes, 1.5% of the test images) have a flipped, rotated, cropped or
+recoloured copy in training or validation. They are listed in
+[leaked-test-images.csv](leaked-test-images.csv) with a visual verdict
+(14 confirmed, 5 likely, 2 same object in a different shot, 2 uncertain).
+We re-evaluated YOLO26s with and without them; nothing was retrained.
+
+| Test subset | Images | Boxes | Precision | Recall | mAP50 | mAP50–95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Full test split (reported above) | 1,569 | 11,098 | 74.8% | 54.6% | 61.9% | 44.5% |
+| **Clean: leaked images removed** | **1,546** | **10,932** | **75.4%** | **54.5%** | **62.0%** | **44.7%** |
+| Only the 23 leaked images | 23 | 166 | 76.5% | 82.6% | 83.7% | 72.6% |
+
+| Class | Full AP50–95 (re-run) | Clean AP50–95 | Change |
+| --- | ---: | ---: | ---: |
+| Biodegradable | 31.4% | 31.3% | −0.1 |
+| Cardboard | 42.9% | 42.8% | −0.1 |
+| Glass | 55.0% | 54.8% | −0.2 |
+| Metal | 50.8% | 50.4% | −0.4 |
+| Paper | 49.3% | 48.9% | −0.4 |
+| Plastic | 37.7% | 39.9% | +2.2 |
+
+The leaked images are much easier for the model (72.6% mAP50–95, against
+44.5% overall), which is the expected sign of having seen a copy in training.
+Because they are only 1.5% of the test images, removing them changes the
+overall score by +0.2 points: the reported 44.5% is not inflated by the
+known duplicates. Five of the six classes drop slightly (by 0.1 to 0.4
+points), as expected. Plastic rises by 2.2 points because its leaked images
+were hard, not easy (20.1% AP50–95 on those images, a crowded bottle pile
+among them). The clean figure, 44.7%, is the one to quote for the final
+model; duplicates that neither search found may still remain.
+
+Reproduce from the repository root after exporting the split
+(`--device mps` on Apple silicon, `cpu` without a GPU):
+
+```powershell
+python assignment-1/task-2/evaluate_clean_test.py --device 0
+```
+
+The full-split row was recomputed on an Apple M4 Pro GPU (Python 3.14.7,
+PyTorch 2.11.0, Ultralytics 8.4.208) and matches the original RTX 5050 run
+to the printed precision (mAP50 61.9%, mAP50–95 44.5%; precision 74.8% here
+vs 74.9%). Per-class values differ by at most 0.2 points (metal 50.8% vs
+51.0%, paper 49.3% vs 49.2%), so the class table compares re-run with re-run.
+
 The test console summaries are saved beside this report. Evaluation used
 Python 3.14.4, PyTorch 2.11.0+cu128, Ultralytics 8.4.208 and an RTX 5050
 Laptop GPU. The YOLOv5 evaluator was from revision
