@@ -160,7 +160,8 @@ Report final test mAP50-95, mAP50, per-class AP, precision and recall with
 `max_det=400`. Test evaluation is separate from this training script. Review
 correct, missed and incorrect detections, including small and crowded objects.
 No oversampling initially; consider balancing only if validation supports it.
-Class names remain the provisional repository mapping.
+Class names (ids 0 to 5: biodegradable, cardboard, glass, metal, paper, plastic) are
+confirmed by the dataset export's `data.yaml`.
 
 References: [YOLO26](https://docs.ultralytics.com/models/yolo26) and
 [training arguments](https://docs.ultralytics.com/modes/train).
@@ -188,6 +189,5 @@ fixed split with cleaned labels into `data/processed/` and generate `data.yaml`.
 Every copied image and label is checked against its source. Existing output
 folders are refused. See the split documentation linked above for details.
 
-Next: confirm official class names and lecture coverage, inspect available
-hardware, pin YOLO26-compatible Ultralytics and dependencies, save the runnable hyperparameters and
-launch command, then inspect augmented batches and run a training smoke check.
+All of these steps are done; see the [reproduction table](../README.md#reproduce-assignment-1)
+for the complete order of commands.

@@ -92,7 +92,8 @@ not drawn; their count is in review.csv. Source images are not modified.
 
 For each CSV row, set placement to pass / concern / uncertain, missing_objects
 to none_observed / concern / uncertain, and add concrete notes. Leave
-class_correctness as unverified until official class metadata is available.
+class_correctness as unverified: class names are confirmed by the export's data.yaml, but this
+sample review does not check whether each object has the right class.
 Do not infer correctness for the entire dataset from this small sample.
 
 Keep these source-image previews local. To preserve review notes, the generator

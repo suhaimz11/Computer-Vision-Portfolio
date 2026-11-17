@@ -22,7 +22,7 @@ Reverification in this review:
   images with a copy in training). Removing the 23
   test images changes test mAP50–95 from 44.5% to 44.7% (see the [Task 2 report](README.md#test-score-without-leaked-duplicates)).
 
-Remaining documentation gaps: official class-name mapping, clear individual group
+Remaining documentation gaps (class names are now confirmed by the export's `data.yaml`): clear individual group
 contributions, and outdated statements that training is unfinished. The dataset link
 can be recovered from the PDF: https://cloud.fiw.fhws.de/s/P9BGwMj7oAZrQ2R . This
 identifies the assigned source; it does not itself verify the class mapping.

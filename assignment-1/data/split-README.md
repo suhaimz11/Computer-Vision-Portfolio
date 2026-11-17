@@ -47,6 +47,6 @@ an `export-report.json`. Existing destinations are refused; a failed partial
 export has no completion report. Use `--output` for a fresh destination.
 
 The dataset copies and local verification split are excluded from Git. Source
-data stays unchanged. YAML class names use the working repository mapping and
-still need publisher confirmation. Keep the test subset fixed and use
+data stays unchanged. YAML class names follow the export's own `data.yaml`
+(biodegradable, cardboard, glass, metal, paper, plastic for ids 0 to 5). Keep the test subset fixed and use
 validation only for tuning and checkpoint selection.

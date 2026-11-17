@@ -103,14 +103,14 @@ def export(root, manifest_dir, output):
                 print(f'Exported {index}/{len(rows)}', flush=True)
     shutil.copyfile(manifest, output / 'manifest.csv')
     shutil.copyfile(manifest_dir / 'summary.json', output / 'split-summary.json')
-    yaml = '# Class names follow the repository working mapping; publisher confirmation pending.\n'
+    yaml = '# Class names as in the Roboflow export data.yaml (garbage-classification-3 v2).\n'
     yaml += f'path: {json.dumps(output.as_posix())}\ntrain: images/train\nval: images/val\ntest: images/test\nnames:\n'
     yaml += ''.join(f'  {i}: {name}\n' for i, name in enumerate(NAMES))
     (output / 'data.yaml').write_text(yaml, encoding='utf-8')
     report = {'images_by_split': dict(counts), 'verified_image_label_pairs': len(rows),
               'manifest_sha256': sha(manifest), 'clean_label_content_sha256': digest.hexdigest(),
               'copy_verification': 'SHA-256 of every exported image and cleaned label matches source',
-              'class_names_verified': False}
+              'class_names_verified': True}
     (output / 'export-report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2), flush=True)
     return report

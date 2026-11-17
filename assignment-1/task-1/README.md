@@ -43,7 +43,9 @@ notes below are the historical pipeline and diagnostic record.
 | 4 | paper | 4,387 | 1,768 |
 | 5 | plastic | 5,945 | 1,464 |
 
-Class names are inferred from filename patterns. Images can contain multiple
+Class names were first inferred from filename patterns and are confirmed by
+the `data.yaml` of the same Roboflow export ("garbage-classification-3", version 2, CC BY 4.0), which lists BIODEGRADABLE, CARDBOARD, GLASS, METAL, PAPER, PLASTIC for ids 0 to 5. That copy
+(downloaded from Kaggle) has the same 10,464 file names. Images can contain multiple
 classes, so image counts overlap. The filename alone does not determine the
 class of every object in an image.
 
@@ -337,8 +339,8 @@ This document records Task 1's dataset analysis and designed training pipeline.
 Full training and quantitative model evaluation belong to Task 2. The sampled
 annotation review does not certify the entire dataset. Near-duplicate detection
 may miss related sources, and retained repeated sources may affect weighting.
-Working class names are inferred; an authoritative mapping and the original
-dataset download URL are not recorded in the repository. The assignment asks
+Class names are confirmed by the export's `data.yaml` (see Class distribution);
+the original course download URL is recorded in the assignment PDF. The assignment asks
 for an approach covered in lectures; lecture coverage has not been independently
 verified here. No accuracy, speed or memory claim is made for an unrun model.
 Individual group contribution statements should identify the actual members
