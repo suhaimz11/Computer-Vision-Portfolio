@@ -67,31 +67,37 @@ material.
 
 ### Missed detections
 
-![biodegradable](results/predictions/missed/biodegradable1553_jpg.rf.3eb0240915f7ec383eae5cf7f9c44ebe.jpg)
-![cardboard](results/predictions/missed/cardboard492_jpg.rf.93ed8aec32ed8f297ab7cc17d7713336.jpg)
-![plastic](results/predictions/missed/plastic724_jpg.rf.5b465d8c23eb2bbea24667f9e2093621.jpg)
+The model produced no prediction boxes in these three test images at confidence
+0.25. Yellow boxes show the dataset objects that were missed.
 
-All three are crowded or unusual scenes with 11-18 annotated objects.
+![Missed objects](results/predictions/missed/metal383_jpg.rf.dd429689d34de9bdc9af4672094492cc.jpg)
 
-- `biodegradable1553`: the model predicted one large box (labelled paper) over
-  the tray and none of the 17 small food-scrap boxes.
-- `cardboard492`: the annotated pieces overlap in a stack; the model produced
-  only a few low-confidence boxes with the wrong class that did not reach
-  IoU 0.5.
-- `plastic724`: the image is strongly colour-shifted (blue) and the bottles
-  overlap heavily; only one prediction (a false alarm) was made.
+One annotated metal object was missed. The image shows an unusual close-up view inside a can.
+
+![Missed objects](results/predictions/missed/paper1042_jpg.rf.d045f3ab7ee5b9104d5c61eb2d03d814.jpg)
+
+All three annotated objects were missed in this rotated image containing a cup, packaging, and a doughnut.
+
+![Missed objects](results/predictions/missed/metal182_jpg.rf.a3e1a96dbcb2b2dcdfbee430b05cbc6f.jpg)
+
+All nine annotated objects were missed in this rotated, low-contrast scene with overlapping containers.
 
 ### Incorrect detections
 
-![biodegradable](results/predictions/incorrect/biodegradable892_jpg.rf.dc07cdabf9d707abcea262b5ee5c317c.jpg)
-![cardboard](results/predictions/incorrect/cardboard1427_jpg.rf.cf0719369a4f4537dc193b3c224435d9.jpg)
-![metal](results/predictions/incorrect/metal174_jpg.rf.a1a37ac743e80e11f185b8339131c3f4.jpg)
+These examples show predictions with the wrong category. Red boxes mark
+predictions that overlap a dataset box at IoU >= 0.5 but have a different class.
 
-- `biodegradable892`: 9 annotated objects, but 59 false alarms, mostly on
-  further pomegranate seeds that are not annotated.
-- `cardboard1427`: 24 false alarms on a pile of boxes.
-- `metal174`: 6 of 9 cans were labelled paper (red); the cans are white with
-  paper labels.
+![Wrong-class prediction](results/predictions/incorrect/glass956_jpg.rf.3b34a1b57d414600ad580491ae64446b.jpg)
+
+Four objects annotated as glass are predicted as metal, with confidence 0.81–0.91. Their reflective appearance makes the material visually ambiguous, so the annotation should also be checked.
+
+![Wrong-class prediction](results/predictions/incorrect/paper1160_jpg.rf.cdce4a52a1a3fe24ead81115c614c72b.jpg)
+
+Two objects annotated as paper in the takeaway-cup image are predicted as metal, with confidence 0.87 and 0.92.
+
+![Wrong-class prediction](results/predictions/incorrect/plastic256_jpg.rf.08555728a98b826954a24ff45bd73749.jpg)
+
+Two objects annotated as plastic are predicted as glass, with confidence 0.54 and 0.25. Transparent packaging can make these materials difficult to distinguish.
 
 ## Analysis of the errors
 
@@ -108,10 +114,8 @@ All three are crowded or unusual scenes with 11-18 annotated objects.
    AP50-95 31.4%, 50.6% missed, 997 false alarms). It is therefore not a simple
    class-imbalance problem. The class contains many small, irregular and
    visually diverse objects (food scraps, seeds) with unclear boundaries, so
-   even correct predictions can fail the IoU criterion. In the examples the
-   model also finds more instances than are annotated, which suggests
-   inconsistent annotation granularity (a hypothesis that needs a manual check;
-   it was not verified).
+   even correct predictions can fail the IoU criterion. Unmatched predictions can also reflect inconsistent annotation granularity.
+   This possibility requires manual checking.
 4. **Cardboard has many false alarms relative to its size** (343 false alarms
    for 703 objects), mainly on piles of boxes where individual instances are
    ambiguous.

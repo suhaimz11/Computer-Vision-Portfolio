@@ -10,7 +10,7 @@ The [portfolio brief](WS2026_ComputerVision_Portfolio-1.pdf) defines five tasks 
 | 2 · Training and evaluation | [Held-out results](assignment-1/task-2/README.md) | [YOLOv5s training](assignment-1/yolov5/README.md), [YOLO26s training](assignment-1/README.md#yolo26s-training-baseline), and evaluator logs in Task 2 |
 | 3 · Visualization and error analysis | [Report with nine annotated examples](assignment-1/task-3/README.md) | [Analysis script](assignment-1/task-3/error_analysis.py) and [metrics](assignment-1/task-3/results/metrics/) |
 
-Task 2 evaluates both detectors. The current Task 3 figures and error analysis use YOLO26s. A YOLOv5s submission needs examples and analysis from YOLOv5s predictions.
+We evaluated YOLOv5s as our lecture-based baseline and compared it with YOLO26s using the same dataset split. YOLO26s achieved higher test mAP50–95, 44.5% compared with 36.5% for YOLOv5s. We selected YOLO26s on validation performance and used it for the final visualization and error analysis in Task 3. The [Task 2 report](assignment-1/task-2/README.md) documents both models and their results.
 
 ### Run Task 3 locally
 

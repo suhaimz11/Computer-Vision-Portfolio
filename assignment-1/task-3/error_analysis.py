@@ -161,16 +161,16 @@ def run(predictions, labels_dir, out_dir, metrics_dir, k=3, iou_thr=0.5):
     small = [x for x in per_img if 1 <= x[0]["n_gt"] <= 20]
     by_stem = {x[0]["stem"]: x for x in small}
     correct = [x[0] for x in small if x[0]["fn"] == 0 and x[0]["fp"] == 0 and x[0]["conf"] == 0]
-    missed = [x[0] for x in small if x[0]["fn"] >= 1]
-    wrong = [x[0] for x in small if x[0]["fp"] + x[0]["conf"] >= 1]
+    missed = [x[0] for x in small if x[0]["fn"] >= 1 and x[0]["tp"] + x[0]["conf"] + x[0]["fp"] == 0]
+    wrong = [x[0] for x in small if x[0]["conf"] >= 1]
     chosen = {}
     chosen["correct"] = pick(correct, lambda r: (r["mean_tp_conf"], r["n_gt"]), k)
     taken = {r["stem"] for r in chosen["correct"]}
     chosen["missed"] = pick([r for r in missed if r["stem"] not in taken],
-                            lambda r: (r["fn"] / r["n_gt"], r["fn"]), k)
+                            lambda r: (-r["n_gt"], r["stem"]), k)
     taken |= {r["stem"] for r in chosen["missed"]}
     chosen["incorrect"] = pick([r for r in wrong if r["stem"] not in taken],
-                               lambda r: (r["fp"] + r["conf"], r["conf"]), k)
+                               lambda r: (r["conf"] / r["n_gt"], -r["fp"], r["conf"]), k)
 
     out_dir = Path(out_dir)
     for cat, recs in chosen.items():
