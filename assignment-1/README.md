@@ -163,8 +163,9 @@ experimental results. Small batches may use gradient accumulation internally.
 
 Training-only augmentation: horizontal flips 0.5, translation 0.1, scaling 0.2,
 and HSV gains 0.015/0.3/0.2. Rotation, vertical flips, shear, perspective,
-mosaic, mixup and copy-paste are disabled for the initial baseline to limit
-additional shrinking of small objects. Inspect the resulting boxes before
+mosaic, mixup and copy-paste are disabled for the initial baseline. A later
+check showed mosaic does not shrink objects in Ultralytics (see the
+[Task 1 augmentation check](task-1/README.md#training-only-augmentation)). Inspect the resulting boxes before
 full training. Validation and test use deterministic preprocessing.
 
 The detection cap is 400 for crowded images (up to 358 annotated objects).
