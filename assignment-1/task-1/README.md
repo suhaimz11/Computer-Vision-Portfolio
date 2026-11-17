@@ -84,8 +84,8 @@ verdicts determined grouping. Unflagged images are not proven unique.
 was used only as reference labels, not for grouping. Merged with the confirmed
 pairs, 44 of its groups cross the split: 23 test images have a copy in
 training or validation and 26 validation images a copy in training (test+train 19 groups,
-train+val 21, test+val 2, all three 2). Two of the 23 test images come from
-review pairs 56 and 235 (`metal708` with `metal764` and `metal846`), which the
+train+val 21, test+val 2, all three 2). One of the 23 test images, `metal708`,
+appears in review pairs 56 and 235 (with `metal764` and `metal846`), which the
 review marked `different_images` but a second visual check judged to be the
 same source. The effect on the final score was measured in
 [Task 2](../task-2/README.md#test-score-without-leaked-duplicates): removing the
