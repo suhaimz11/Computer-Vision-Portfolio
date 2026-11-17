@@ -20,7 +20,6 @@ IMG_EXT = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 GREEN, YELLOW, BLUE, RED, ORANGE = (0, 200, 0), (0, 220, 255), (255, 120, 0), (0, 0, 255), (0, 140, 255)
 
 
-# ----------------------------------------------------------------- matching
 def iou_matrix(a, b):
     """IoU between boxes a (N,4) and b (M,4), both normalised xyxy."""
     if len(a) == 0 or len(b) == 0:
@@ -55,7 +54,6 @@ def match(gt_cls, gt_box, p_cls, p_box, p_conf, iou_thr=0.5):
     return pred_status, pred_gt, gt_status
 
 
-# ------------------------------------------------------------------ helpers
 def read_gt(label_path):
     cls, box = [], []
     for line in Path(label_path).read_text().splitlines():
@@ -110,7 +108,6 @@ def draw(img_path, gt_cls, gt_box, gt_status, p_cls, p_box, p_conf, p_status, ti
     return np.vstack([bar, img])
 
 
-# -------------------------------------------------------------- prediction
 def predict_all(weights, paths, imgsz, conf, device):
     """Yield (path, boxes xyxy normalised, classes, confidences) per image."""
     from ultralytics import YOLO
@@ -122,7 +119,6 @@ def predict_all(weights, paths, imgsz, conf, device):
                r.boxes.conf.cpu().numpy())
 
 
-# -------------------------------------------------------------------- main
 def run(predictions, labels_dir, out_dir, metrics_dir, k=3, iou_thr=0.5):
     records, per_img = [], []
     cls_stats = {c: Counter() for c in range(len(CLASSES))}
@@ -189,12 +185,16 @@ def run(predictions, labels_dir, out_dir, metrics_dir, k=3, iou_thr=0.5):
 
 
 def main():
+    assignment = Path(__file__).resolve().parents[1]
+    test_data = assignment / "data/processed"
+    output = assignment.parent / "runs/task3"
+
     ap = argparse.ArgumentParser()
-    ap.add_argument("--weights", required=True)
-    ap.add_argument("--images", default="data/processed/images/test")
-    ap.add_argument("--labels", default="data/processed/labels/test")
-    ap.add_argument("--out", default="results/predictions")
-    ap.add_argument("--metrics", default="results/metrics")
+    ap.add_argument("--weights", default=str(assignment / "runs/train/yolo26s_baseline-2/weights/best.pt"))
+    ap.add_argument("--images", default=str(test_data / "images/test"))
+    ap.add_argument("--labels", default=str(test_data / "labels/test"))
+    ap.add_argument("--out", default=str(output / "predictions"))
+    ap.add_argument("--metrics", default=str(output / "metrics"))
     ap.add_argument("--imgsz", type=int, default=640)
     ap.add_argument("--conf", type=float, default=0.25)
     ap.add_argument("--device", default="0")

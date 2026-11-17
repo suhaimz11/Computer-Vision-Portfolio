@@ -268,3 +268,5 @@ assignment-1/data/split-check/
 *.pkl
 assignment-1/reports/team-duplicates-run*/
 assignment-1/reports/manual-group-review/
+# Local analysis and evaluation reruns
+/runs/

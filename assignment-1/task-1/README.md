@@ -1,7 +1,23 @@
 # Task 1: Dataset analysis and training pipeline
 
+
+## Task 1 files
+
+| Work | Evidence and implementation |
+| --- | --- |
+| Dataset audit and annotation review | [Audit results](../reports/audit.json), [audit script](../audit_dataset.py), [annotation sampling script](../sample_annotations.py) |
+| Duplicate detection and review | [Duplicate detection pipeline](../duplicates/README.md), [supplied duplicate lists](../data/team-duplicates/), [review decisions](../reports/duplicate-review/review.csv) |
+| Label cleaning | [Verification notes and removal log](../data/prepared/README.md) |
+| Train, validation, and test split | [Split documentation](../data/split-README.md), [manifest](../data/split/manifest.csv), [split summary](../data/split/summary.json), [split script](../prepare_split.py) |
+| Dataset export | [YOLO export script](../export_yolo.py) |
+
+Training and evaluation use the fixed split and exported data in the shared
+`assignment-1/data/` directory. The original dataset is local in
+`assignment-1/GarbageDataset/`.
+
+
 Status update (2026-11-12): the 60-epoch baseline has completed. The
-[training review](training-review.md) records verified validation results,
+[training review](../task-2/training-review.md) records verified validation results,
 Task 1 requirement checks and proposed improvement experiments. Training-status
 notes below are the historical pipeline and diagnostic record.
 
@@ -50,7 +66,7 @@ The SIFT/RootSIFT loose search produced 364 unique candidate pairs with at least
 mirroring, cropping or color edits. Separate photographs were marked
 `different_images`, even if they depicted similar objects.
 
-Final decisions in [review.csv](duplicate-review/review.csv): **341 same-source
+Final decisions in [review.csv](../reports/duplicate-review/review.csv): **341 same-source
 pairs, 23 different-image pairs, zero pending or uncertain decisions**. These
 are pair counts, not counts of removable images. The 23 different pairs are:
 56, 91, 173, 189, 197, 208, 220, 221, 228, 233, 235, 255, 256, 267, 273, 282,
@@ -285,8 +301,8 @@ responsible for these activities; names have not been supplied in this record.
 
 ## References and supporting files
 
-- [Raw dataset audit](audit.json)
-- [Duplicate review instructions](duplicate-review/README.txt) and [decisions](duplicate-review/review.csv)
+- [Raw dataset audit](../reports/audit.json)
+- [Duplicate review instructions](../reports/duplicate-review/README.txt) and [decisions](../reports/duplicate-review/review.csv)
 - [Cleaned label verification notes](../data/prepared/README.md)
 - [Split/export documentation](../data/split-README.md)
 - [Official YOLO26 model documentation](https://docs.ultralytics.com/models/yolo26)

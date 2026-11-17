@@ -44,7 +44,7 @@ Eligible crops per class:
 | paper | 2,797 | 7.1% | 633 | 625 | 264 |
 | plastic | 3,626 | 9.2% | 764 | 770 | 215 |
 
-The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same split, run at 640 pixels with `max_det = 400` (`assignment-1/train_detector.py`). The selected checkpoint (best of 60 epochs on validation) reaches, on the 1,569 test images and 11,098 test boxes, precision 74.9%, recall 54.6%, mAP50 61.9% and mAP50-95 44.5% (`assignment-1/reports/task-2-results.md`). Its recall is lowest for biodegradable (43.5%) and plastic (48.5%) and highest for glass (64.6%).
+The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same split, run at 640 pixels with `max_det = 400` (`assignment-1/train_detector.py`). The selected checkpoint (best of 60 epochs on validation) reaches, on the 1,569 test images and 11,098 test boxes, precision 74.9%, recall 54.6%, mAP50 61.9% and mAP50-95 44.5% (`assignment-1/task-2/README.md`). Its recall is lowest for biodegradable (43.5%) and plastic (48.5%) and highest for glass (64.6%).
 
 ### 0.3 Three rules carried over from Task 1
 
@@ -277,4 +277,4 @@ Crops from one photo are not independent (same light, same background, often the
 7. Lecture "Recap" (deck 03): pages 33 to 37 (k-nearest neighbours), 44 (PCA). Lecture "Recap 2" (deck 04): slides 68 and 69 (precision, recall, IoU-based matching for AP; PDF pages 67 and 68), 129 and 130 (clustering in latent space; PDF pages 124 and 125).
 8. Lecture "Self-supervised Learning" (deck 12): page 13 (linear evaluation, clustering and t-SNE for representation quality).
 9. Lecture "Detection of Deepfakes and AI-Generated Visual Content" (deck 13): page 32 (k-NN distance, One-Class SVM and Mahalanobis distance for samples outside the known distribution).
-10. Our data and code: `assignment-1/data/split/manifest.csv` and `summary.json` (split), `assignment-1/reports/task-1-findings.md` (dataset audit and detector), `assignment-1/train_detector.py` (YOLO26s settings), `assignment-2/task-1-loss-and-sampling.md` (model, loss and sampling).
+10. Our data and code: `assignment-1/data/split/manifest.csv` and `summary.json` (split), `assignment-1/task-1/README.md` (dataset audit and detector), `assignment-1/train_detector.py` (YOLO26s settings), `assignment-2/task-1/README.md` (model, loss and sampling).

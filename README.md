@@ -1,29 +1,39 @@
 # Computer Vision Portfolio
 
-Computer vision assignments, implementation code, analysis, and results.
+The [portfolio brief](WS2026_ComputerVision_Portfolio-1.pdf) defines five tasks across two assignments.
 
-## Assignments
+## Assignment 1 · Waste object detection
 
-- [Assignment 1: Waste Object Detection](assignment-1/README.md): read-only dataset
-  audit, measured findings, tests, and a completed 60-epoch baseline. See the
-  [training review](assignment-1/reports/training-review.md) for results and next experiments.
-- `assignment-2/`: reserved for the theoretical deep metric learning assignment.
+| Task | Deliverable | Implementation and evidence |
+| --- | --- | --- |
+| 1 · Dataset analysis and pipeline | [Dataset and pipeline report](assignment-1/task-1/README.md) | [Audit, duplicate review, split and export instructions](assignment-1/README.md#dataset-audit) |
+| 2 · Training and evaluation | [Held-out results](assignment-1/task-2/README.md) | [YOLOv5s training](assignment-1/yolov5/README.md), [YOLO26s training](assignment-1/README.md#yolo26s-training-baseline), and evaluator logs in Task 2 |
+| 3 · Visualization and error analysis | [Report with nine annotated examples](assignment-1/task-3/README.md) | [Analysis script](assignment-1/task-3/error_analysis.py) and [metrics](assignment-1/task-3/results/metrics/) |
 
-## Dataset
+Task 2 evaluates both detectors. The current Task 3 figures and error analysis use YOLO26s. A YOLOv5s submission needs examples and analysis from YOLOv5s predictions.
 
-The full dataset is local and excluded from Git. Place the images and YOLO labels
-in `assignment-1/GarbageDataset/images/` and `assignment-1/GarbageDataset/labels/`.
-The dataset download URL and official class mapping still need to be documented.
-Cloning this repository alone does not provide the dataset.
+### Run Task 3 locally
 
-See the Assignment 1 README for environment setup, manual execution, outputs,
-limitations, and the next steps. Aggregate audit results and written findings
-are versioned; generated dataset image previews remain local.
+With the virtual environment active, run this from the repository root.
 
-## Collaboration
+```powershell
+python .\assignment-1\task-3\error_analysis.py
+```
 
-Pull the latest changes and create a task branch before making changes. Submit
-a pull request when the work is ready for review. Keep datasets, environments,
-model weights, and secrets out of commits. Document dependencies and run commands
-alongside each assignment. Each member's contribution must be recorded for the
-final submission.
+The script uses the prepared test split and YOLO26s checkpoint by default.
+It writes examples and metrics to `runs/task3/`. Add `--device cpu` to run
+without CUDA. See the [Task 3 README](assignment-1/task-3/README.md) for
+the checkpoint path.
+
+## Assignment 2 · Deep metric learning
+
+1. [Loss function and sampling strategy](assignment-2/task-1/README.md)
+2. [Analysis and use of the learned embedding space](assignment-2/task-2/README.md)
+
+Both tasks are theoretical.
+
+## Local setup and submission
+
+The dataset, virtual environment, and model weights are stored locally. See the [Assignment 1 setup](assignment-1/README.md#setup) for dataset placement and dependencies. Run the local tests from the repository root with `python -m unittest discover -s assignment-1/tests -v`.
+
+The submission also requires the trained checkpoint, a short presentation covering both assignments, and a statement identifying each group member's contribution.

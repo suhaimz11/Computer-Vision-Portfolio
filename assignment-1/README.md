@@ -1,13 +1,12 @@
 # Assignment 1: Waste Object Detection
 
 The dataset audit, visual review and duplicate pair review are complete.
-The complete [Task 1 report](reports/task-1-findings.md) documents the analysis,
+The complete [Task 1 report](task-1/README.md) documents the analysis,
 cleaning, verified split/export and selected YOLO26s training pipeline.
 The reproducible split workflow verifies cleaned labels before assigning data.
 The 60-epoch baseline is complete. Best logged validation mAP50 is 62.35% and
-mAP50-95 is 44.20% (epoch 57). See the [training review](reports/training-review.md)
-for the Task 1 assessment and runnable improvement experiments. Historical
-diagnostic notes below describe earlier runs; final test evaluation is pending.
+mAP50-95 is 44.20% (epoch 57). See the [training review](task-2/training-review.md)
+for the Task 1 assessment and runnable improvement experiments. The [held-out test results](task-2/README.md) and [visual error analysis](task-3/README.md) are available.
 
 ## Setup
 
@@ -59,7 +58,7 @@ We inspected all 30 sampled images and found that the boxes fit the visible
 objects. This checks placement in the sample, not every annotation in the dataset.
 Generated image previews and the working checklist are excluded from Git.
 
-See [findings](reports/task-1-findings.md) and [raw results](reports/audit.json).
+See [findings](task-1/README.md) and [raw results](reports/audit.json).
 
 ## Duplicate checking
 
@@ -168,8 +167,7 @@ References: [YOLO26](https://docs.ultralytics.com/models/yolo26) and
 The CUDA environment and a short full-precision training/validation smoke run
 have been verified. After an intermittent CUDA illegal-instruction failure,
 the current full-data run uses `--no-amp --workers 0 --cuda-debug`; the user has
-reported successful completion of epoch 1. Final training results and test
-metrics are pending. See the Task 1 report for the diagnostic record.
+reported successful completion of epoch 1. See the [held-out test results](task-2/README.md). See the Task 1 report for the diagnostic record.
 
 ## Tests
 

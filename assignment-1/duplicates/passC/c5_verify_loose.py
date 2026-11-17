@@ -21,7 +21,6 @@ def ver(a,b,m):
     ms=bf.knnMatch(Da,D[b],k=2)
     g=[x for x,y in (q for q in ms if len(q)==2) if x.distance<0.8*y.distance]
     if len(g)<4: return len(g),0
-    # flipped query pts: mirror x
     g=[x for x in g if B<pa[x.queryIdx][0]<416-B and B<pa[x.queryIdx][1]<416-B and B<P[b][x.trainIdx][0]<416-B and B<P[b][x.trainIdx][1]<416-B]
     if len(g)<4: return len(g),0
     s=np.float32([pa[x.queryIdx] for x in g]); d=np.float32([P[b][x.trainIdx] for x in g])

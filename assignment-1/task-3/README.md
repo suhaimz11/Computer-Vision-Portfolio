@@ -17,16 +17,18 @@ A ground-truth object with no matching prediction is **missed**.
 Colour code in the figures: green = ground truth, blue = correct,
 red = wrong class, orange = false alarm, yellow = missed ground truth.
 
-Reproduce (from the repository root, with the model at
-`assignment-1/models/yolo26s_best.pt`):
+Run from the repository root after preparing the dataset and saving the
+YOLO26s checkpoint at `assignment-1/runs/train/yolo26s_baseline-2/weights/best.pt`.
 
 ```powershell
-python assignment-1\make_team_test.py --list assignment-1\data\split\test.txt --src assignment-1\GarbageDataset --dst assignment-1\data\team_test
-python assignment-1\error_analysis.py --weights assignment-1\models\yolo26s_best.pt --images assignment-1\data\team_test\images --labels assignment-1\data\team_test\labels --device cpu
+python assignment-1/task-3/error_analysis.py
 ```
 
-Outputs: `results/predictions/{correct,missed,incorrect}/` and
-`results/metrics/{errors_per_class,class_confusions,error_summary_per_image}.csv`.
+The script uses the prepared test split and GPU 0 by default. Pass
+`--device cpu` to use the CPU or `--help` to see the available overrides.
+
+The checked-in examples and metrics are in `results/` beside this report.
+The reproduction command writes to `runs/task3/` from the repository root.
 
 ## Overall result
 
@@ -54,9 +56,9 @@ glass (15), metal -> glass (15), plastic -> paper (15).
 
 ### Correct detections
 
-![cardboard](../results/predictions/correct/cardboard632_jpg.rf.57f52afa4c5f2248b98a882f4e313f43.jpg)
-![metal](../results/predictions/correct/metal623_jpg.rf.0de5fa2202e76f7beea4bcf9fcccf19f.jpg)
-![paper](../results/predictions/correct/paper1767_jpeg.rf.14e6a301b93a41b99a091b372445fccc.jpg)
+![cardboard](results/predictions/correct/cardboard632_jpg.rf.57f52afa4c5f2248b98a882f4e313f43.jpg)
+![metal](results/predictions/correct/metal623_jpg.rf.0de5fa2202e76f7beea4bcf9fcccf19f.jpg)
+![paper](results/predictions/correct/paper1767_jpeg.rf.14e6a301b93a41b99a091b372445fccc.jpg)
 
 Single, large, well-isolated objects (a flattened box, an aluminium tray,
 crumpled paper) detected with confidence of about 0.97. This is the easy case:
@@ -65,9 +67,9 @@ material.
 
 ### Missed detections
 
-![biodegradable](../results/predictions/missed/biodegradable1553_jpg.rf.3eb0240915f7ec383eae5cf7f9c44ebe.jpg)
-![cardboard](../results/predictions/missed/cardboard492_jpg.rf.93ed8aec32ed8f297ab7cc17d7713336.jpg)
-![plastic](../results/predictions/missed/plastic724_jpg.rf.5b465d8c23eb2bbea24667f9e2093621.jpg)
+![biodegradable](results/predictions/missed/biodegradable1553_jpg.rf.3eb0240915f7ec383eae5cf7f9c44ebe.jpg)
+![cardboard](results/predictions/missed/cardboard492_jpg.rf.93ed8aec32ed8f297ab7cc17d7713336.jpg)
+![plastic](results/predictions/missed/plastic724_jpg.rf.5b465d8c23eb2bbea24667f9e2093621.jpg)
 
 All three are crowded or unusual scenes with 11-18 annotated objects.
 
@@ -81,9 +83,9 @@ All three are crowded or unusual scenes with 11-18 annotated objects.
 
 ### Incorrect detections
 
-![biodegradable](../results/predictions/incorrect/biodegradable892_jpg.rf.dc07cdabf9d707abcea262b5ee5c317c.jpg)
-![cardboard](../results/predictions/incorrect/cardboard1427_jpg.rf.cf0719369a4f4537dc193b3c224435d9.jpg)
-![metal](../results/predictions/incorrect/metal174_jpg.rf.a1a37ac743e80e11f185b8339131c3f4.jpg)
+![biodegradable](results/predictions/incorrect/biodegradable892_jpg.rf.dc07cdabf9d707abcea262b5ee5c317c.jpg)
+![cardboard](results/predictions/incorrect/cardboard1427_jpg.rf.cf0719369a4f4537dc193b3c224435d9.jpg)
+![metal](results/predictions/incorrect/metal174_jpg.rf.a1a37ac743e80e11f185b8339131c3f4.jpg)
 
 - `biodegradable892`: 9 annotated objects, but 59 false alarms, mostly on
   further pomegranate seeds that are not annotated.
