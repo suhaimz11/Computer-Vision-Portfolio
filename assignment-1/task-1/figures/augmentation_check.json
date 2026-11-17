@@ -1,0 +1,25 @@
+{
+  "samples_per_setting": 1000,
+  "seed": 42,
+  "input_px": 640,
+  "results": {
+    "no augmentation": {
+      "boxes": 7656,
+      "median_px": 84.6,
+      "below_16_px": 0.0074,
+      "below_32_px": 0.1246
+    },
+    "baseline (mosaic off)": {
+      "boxes": 7368,
+      "median_px": 84.7,
+      "below_16_px": 0.0148,
+      "below_32_px": 0.1452
+    },
+    "baseline + mosaic 1.0": {
+      "boxes": 10535,
+      "median_px": 92.2,
+      "below_16_px": 0.0094,
+      "below_32_px": 0.121
+    }
+  }
+}

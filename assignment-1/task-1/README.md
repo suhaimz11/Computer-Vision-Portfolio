@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Biodegradable has 61.3% of the 74,073 boxes; 10.3 times more boxes than the smallest class in training | Split balanced per class (image presence and box counts); per-class AP always reported; no oversampling until validation shows a need | [Split](#reproducible-trainvalidationtest-split), [Task 2](../task-2/README.md) |
 | 1 to 358 objects per image; 5,082 images hold one object, while the 5% most crowded images hold about half of all boxes | Detection cap `max_det=400` (checked: raising it to 500 changes test mAP50–95 by 0.03 points); results reported by crowding | [Parameters](#training-parameters-and-strategy), [Task 3](../task-3/README.md) |
-| 36.45% of boxes cover under 1% of the image | 640-pixel input instead of the native 416; mild scaling (0.2); mosaic, mixup and copy-paste off so small objects are not shrunk further | [Preprocessing](#selected-detector-and-preprocessing), [augmentation](#training-only-augmentation) |
+| 36.45% of boxes cover under 1% of the image | 640-pixel input instead of the native 416; mild scaling (0.2). Mosaic, mixup and copy-paste were left off in the baseline; a later check showed mosaic would not have shrunk objects (see augmentation) | [Preprocessing](#selected-detector-and-preprocessing), [augmentation](#training-only-augmentation) |
 | Flipped, rotated, cropped and recoloured copies of photos (364 candidate pairs reviewed, 267 groups) | Group-aware split keeps confirmed copies in one subset; remaining copies found later were measured (test mAP50–95 44.5% with, 44.7% without) | [Duplicates](#duplicate-review-and-leakage-prevention) |
 | 17 zero-area boxes | Removed, logged and verified; every other box kept | [Cleaning](#annotation-cleaning) |
 | All images are 416 x 416 and decode correctly; no exact duplicates | Same letterbox preprocessing for every split; no image dropped | [Audit](#audit-results) |
@@ -264,13 +264,38 @@ validation. A 416-pixel comparison may be made if compute permits.
 | Scaling | 0.2 | Moderate size variation while limiting additional shrinking |
 | HSV hue/saturation/value | 0.015 / 0.3 / 0.2 | Moderate color and illumination variation |
 | Rotation, vertical flip, shear, perspective | Disabled | Keep the initial transformation policy simple |
-| Mosaic, mixup, copy-paste | Disabled | Limit extra shrinking and synthetic crowding in the baseline |
+| Mosaic, mixup, copy-paste | Disabled | Keep the baseline to whole, unmixed photos; mosaic is the first planned experiment |
 
-These are baseline design choices, not augmentation results. With 36.45% of
-boxes below 1% of image area and some highly crowded scenes, aggressive
-transformations may damage useful small-object supervision. Training batch
-plots are enabled for inspection. Validation and test use deterministic
-preprocessing without random training augmentation.
+These are baseline design choices, not tuned results. Validation and test use
+deterministic preprocessing without random training augmentation.
+
+**Checked after training: what the augmentation does to object sizes.** The
+original concern was that strong augmentation would shrink the many small
+objects further. [augmentation_check.py](augmentation_check.py) passes 1,000
+random training images through the Ultralytics training loader and measures
+every box in pixels of the 640-pixel network input (no training involved):
+
+| Setting | Boxes measured | Median box size | Boxes under 16 px | Boxes under 32 px |
+| --- | ---: | ---: | ---: | ---: |
+| No augmentation | 7,656 | 84.6 px | 0.7% | 12.5% |
+| Baseline (scale 0.2, translate 0.1, flips, HSV) | 7,368 | 84.7 px | 1.5% | 14.5% |
+| Baseline + mosaic 1.0 | 10,535 | 92.2 px | 0.9% | 12.1% |
+
+- The baseline makes slightly more boxes small (14.5% under 32 px against
+  12.5%), through the random down-scaling of up to 20%.
+- **Mosaic does not shrink objects** in this implementation: each of the four
+  photos keeps its full 640-pixel scale on a 1,280-pixel canvas, and a
+  640-pixel window is cropped from it. It shows parts of several photos (more
+  boxes per sample) rather than smaller objects. The concern that led us to
+  turn mosaic off is therefore not supported; whether mosaic improves
+  accuracy can only be answered by a training run, which is the first planned
+  experiment ([training review](../task-2/training-review.md)).
+
+![16 random training images after the baseline augmentation](figures/augmented_training_batch.jpg)
+
+The augmented samples above (16 random training images, baseline settings)
+show flips, shifts (grey borders), mild scaling and colour changes, with every
+box still on its object.
 
 ## Training parameters and strategy
 
