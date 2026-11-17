@@ -79,19 +79,34 @@ Dataset images and feature caches are local; this specific preview set is versio
 
 ## Structure
 
-```text
-assignment-1/
-  audit_dataset.py          Dataset integrity and annotation checks
-  sample_annotations.py     Random annotation previews
-  check_duplicates.py       Run the teammate's five pipeline stages
-  duplicates/passC/         Teammate's pipeline with portable path configuration
-  data/team-duplicates/     Teammate's supplied result CSVs
-  data/prepared/            Removal log and local cleaned label copies
-  GarbageDataset/           Original dataset; local only
-  reports/                  Findings and local generated reviews
-  tests/                    Dataset audit tests
-  local-archive/            Our superseded duplicate checker; local only
-```
+Every script, in pipeline order, with what it reads and writes. Paths are
+relative to `assignment-1/`; run commands from the repository root (see the
+[reproduction table](../README.md#reproduce-assignment-1)).
+
+| Stage | Script | Reads | Writes |
+| --- | --- | --- | --- |
+| Task 1 · audit | `audit_dataset.py` | `GarbageDataset/` | `reports/audit.json` |
+| Task 1 · visual check | `sample_annotations.py` | `GarbageDataset/` | local preview images and a review checklist |
+| Task 1 · duplicates | `check_duplicates.py` → `duplicates/passC/c1`–`c5` ([stages](duplicates/README.md)) | `GarbageDataset/images/` | `reports/team-duplicates-run*/verified2.csv`, `verified3.csv` |
+| Task 1 · duplicate review | `preview_duplicates.py` | latest `verified3.csv` | `reports/duplicate-review/` (`review.csv`, previews) |
+| Task 1 · label check | `check_name_label_mismatch.py` | `data/prepared/labels/`, `data/split/manifest.csv` | `reports/name-label-mismatches.csv` |
+| Task 1 · cleaned labels | `rebuild_prepared_labels.py` | `GarbageDataset/labels/`, `data/prepared/removed_rows.txt` | `data/prepared/labels/` |
+| Task 1 · split | `prepare_split.py` | `GarbageDataset/`, `data/prepared/`, `review.csv` | `data/split/manifest.csv`, `summary.json` |
+| Task 1 · export | `export_yolo.py` | `data/split/`, `GarbageDataset/images/`, `data/prepared/labels/` | `data/processed/` with `data.yaml` |
+| Task 2 · train YOLO26s | `train_detector.py` | `data/processed/data.yaml`, `yolo26s.pt` | `runs/train/<name>/` (submitted copy: `models/yolo26s-best.pt`) |
+| Task 2 · train YOLOv5s | `yolov5/train.py` (+ `worker.py`) | `data/processed/`, YOLOv5 v7.0 code | `yolov5/runs/<run>/` (submitted copy: `models/yolov5s-best.pt`) |
+| Task 2 · leak-free test | `task-2/evaluate_clean_test.py` | `models/`, `data/processed/`, `task-2/leaked-test-images.csv` | `../runs/clean-test/results.json` |
+| Task 2 · confidence intervals | `task-2/bootstrap_test_ci.py` | `models/`, `data/processed/data.yaml` | `task-2/test-confidence-intervals.json` |
+| Task 3 · threshold | `task-3/select_threshold.py` | `models/`, validation split | `task-3/results/metrics/threshold_selection_val.csv` |
+| Task 3 · examples and errors | `task-3/error_analysis.py` | `models/`, test split | `../runs/task3/` (checked-in copy: `task-3/results/`) |
+| Task 3 · breakdowns | `task-3/breakdowns.py` | `models/`, test split | `task-3/results/metrics/breakdowns_test.csv`, `breakdowns_test.png` |
+| Task 3 · error types | `task-3/error_types.py` | `models/`, test split | `task-3/results/metrics/error_types_test.csv` |
+| Tests | `tests/` | small synthetic files | — |
+
+Folders: `GarbageDataset/` (original data, local only), `data/` (split,
+duplicate lists, removal log), `models/` (submitted checkpoints), `reports/`
+(audit, duplicate review, label check), `task-1/` to `task-3/` (reports and
+their scripts), `duplicates/passC/` (duplicate-search stages).
 
 Datasets, caches, old/generated review runs and local archives are excluded from Git.
 The current 364-pair preview set, code, supplied result CSVs and findings are versioned.
