@@ -159,8 +159,11 @@ share of predictions that are correct.
 - **Image type matters less than it first appears.** Scenes look much harder
   (56% vs 79% recall), but they are also far more crowded. At the same
   crowding level the gap shrinks (single object: 94.5% vs 93.7%; more than 20
-  objects: 57.4% vs 48.3%), except for 6–20 objects (80.0% vs 62.7%), so
-  clutter explains most of the gap and the background part of it.
+  objects: 57.4% vs 48.3%, but only 6 white-background images), except for
+  6–20 objects (80.0% vs 62.7%), so clutter explains most of the gap and the
+  background part of it
+  ([table](results/metrics/recall_crowding_imagetype_test.csv), written by
+  `breakdowns.py`).
 
 **Recall by class and object size** ([class_size_recall.py](class_size_recall.py),
 [table](results/metrics/recall_class_size_test.csv)):
