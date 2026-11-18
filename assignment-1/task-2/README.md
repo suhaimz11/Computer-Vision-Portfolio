@@ -69,8 +69,9 @@ to 60: the model had converged, so longer training would not help.
   test images for both models, [paired-bootstrap.json](paired-bootstrap.json))
   puts the difference at **+7.3 points mAP50–95 (95% interval +6.0 to +8.5)**;
   the final model was ahead in all 1,000 resamples. The two separate intervals
-  above nearly touch only because each also contains image-to-image variation,
-  which cancels when both models are scored on the same images.
+  above overlap slightly (baseline up to 48.8%, final from 48.7%) only because
+  each also contains image-to-image variation, which cancels when both models
+  are scored on the same images.
 
   | Difference final − baseline | Value | 95% interval |
   | --- | ---: | --- |
@@ -89,7 +90,7 @@ to 60: the model had converged, so longer training would not help.
 - **A third duplicate search, in all 8 orientations,** found 6 more test
   images with a copy (see [below](#search-for-rotated-and-flipped-copies)).
   Removing all 29 known leaked images still gives **51.9%**
-  ([clean-test-extended.json](clean-test-extended.json)).
+  ([clean-test-extended.json](clean-test-extended.json)); 29 is a lower bound.
 - **Biodegradable stays the weakest class**, its interval below every other
   class's point estimate: small objects in crowded piles remain the main
   limitation (Task 3).
@@ -134,10 +135,22 @@ the two images also correlate strongly in the matching orientation
   background. The 6 are added in
   [leaked-test-images-extended.csv](leaked-test-images-extended.csv) (29 images).
 - The hash missed 18 of the 23 known copies, which are cropped or recoloured;
-  each search catches a different kind of copy, so all three are needed.
+  each search catches a different kind of copy, so all three are needed, and
+  29 is a lower bound: more copies that none of the three searches finds may
+  remain.
 - Final model, test mAP50–95: full split 51.8%; without all 29 leaked images
-  (1,540 images) **51.9%**; on the 29 leaked images alone 70.1%. The leak does
-  not inflate the reported score.
+  (1,540 images) **51.9%**; on the 29 leaked images alone 70.1%. Removing the
+  copies we know of does not lower the score; unknown copies cannot be ruled
+  out, but each search so far has changed the score by at most 0.2 points.
+
+Reproduce (writes `runs/clean-test/results.json`, copied here as
+[clean-test-extended.json](clean-test-extended.json)):
+
+```powershell
+python assignment-1/task-2/orientation_duplicate_check.py
+python assignment-1/task-2/evaluate_clean_test.py --device 0 --leaked assignment-1/task-2/leaked-test-images-extended.csv
+python assignment-1/task-2/paired_bootstrap.py --device 0
+```
 
 Raw matches are in [orientation-duplicate-check.json](orientation-duplicate-check.json).
 
