@@ -6,13 +6,13 @@
 | --- | --- | --- |
 | Biodegradable has 61.3% of the 74,073 boxes; 10.3 times more boxes than the smallest class in training | Split balanced per class (image presence and box counts); per-class AP always reported; no oversampling until validation shows a need | [Split](#reproducible-trainvalidationtest-split), [Task 2](../task-2/README.md) |
 | 1 to 358 objects per image; 5,082 images hold one object, while the 5% most crowded images hold about half of all boxes | Detection cap `max_det=400` (checked: raising it to 500 changes test mAP50–95 by 0.03 points); results reported by crowding | [Parameters](#training-parameters-and-strategy), [Task 3](../task-3/README.md) |
-| 36.45% of boxes cover under 1% of the image | 640-pixel input instead of the native 416; mild scaling (0.2). Mosaic, mixup and copy-paste were left off in the baseline; a later check showed mosaic would not have shrunk objects (see augmentation) | [Preprocessing](#selected-detector-and-preprocessing), [augmentation](#training-only-augmentation) |
-| Initial review found 267 groups; the wider audit found 44 additional groups crossing the split | Keep reviewed groups together, disclose remaining leakage, and evaluate again after excluding 23 affected test images (mAP50–95 44.5% full, 44.7% after exclusion) | [Duplicates](#duplicate-review-and-leakage-prevention) |
+| 36.45% of boxes cover under 1% of the image | 640-pixel input instead of the native 416. The baseline used mild scaling (0.2) and no mosaic; a later check showed mosaic does not shrink objects, so the final model uses mosaic and stronger augmentation (test mAP50–95 44.5% → 51.8%) | [Preprocessing](#selected-detector-and-preprocessing), [augmentation](#training-only-augmentation) |
+| Initial review found 267 duplicate groups; later audits found 44 more groups crossing the split, and an 8-orientation search 6 more test images (29 affected test images in total) | Keep reviewed groups together, disclose remaining leakage, and evaluate again after excluding the affected test images (final model: mAP50–95 51.8% full, 51.9% after excluding all 29; baseline 44.5% and 44.7% after excluding 23) | [Duplicates](#duplicate-review-and-leakage-prevention) |
 | 17 zero-area boxes | Removed, logged and verified; every other box kept | [Cleaning](#annotation-cleaning) |
 | All images are 416 x 416 and decode correctly; no exact duplicates | Same letterbox preprocessing for every split; no image dropped | [Audit](#audit-results) |
 | File-name class differs from the labels in 133 images | Labels, not file names, are the ground truth; class names confirmed by the export's `data.yaml` | [File names](#file-names-versus-labels) |
 | 220 to 398 test images per class | Test used once, after all choices were made on validation; 95% confidence intervals reported | [Evaluation design](#model-selection-and-evaluation-design) |
-| Training hardware: one 8 GB RTX 5050 laptop GPU | Small model (YOLO26s), batch 4, mixed precision | [Parameters](#training-parameters-and-strategy) |
+| Training hardware: one 8 GB RTX 5050 laptop GPU (baseline); Apple M4 Pro GPU (final model) | Small model (YOLO26s), mixed precision; batch 4 for the baseline, batch 16 for the final model | [Parameters](#training-parameters-and-strategy) |
 
 
 
@@ -157,8 +157,9 @@ train+val 21, test+val 2, all three 2). One of the 23 test images, `metal708`,
 appears in review pairs 56 and 235 (with `metal764` and `metal846`), which the
 review marked `different_images` but a second visual check judged to be the
 same source. The effect on the final score was measured in
-[Task 2](../task-2/README.md#test-score-without-leaked-duplicates): removing the
-23 test images changes test mAP50–95 from 44.5% to 44.7%.
+[Task 2](../task-2/README.md#test-score-without-leaked-duplicates-baseline): removing the
+23 test images changes test mAP50–95 from 44.5% to 44.7% for the baseline and
+from 51.8% to 51.9% for the final model.
 
 Duplicates were retained together in one subset rather than deleted. This
 prevents leakage between the confirmed copies while preserving images and labels.
@@ -248,7 +249,8 @@ are excluded from Git; code, review decisions and split manifests are versioned.
 The selected baseline is **COCO-pretrained YOLO26s (`yolo26s.pt`)**, fine-tuned
 using the Ultralytics Python API. It is a practical small-model starting point
 for the available Intel i7 / NVIDIA RTX 5050 system with 8 GB GPU memory.
-Its test results are in [Task 2](../task-2/README.md) (mAP50–95 44.5%).
+Its test results are in [Task 2](../task-2/README.md): mAP50–95 44.5% with the
+baseline recipe and 51.8% with the final, stronger recipe.
 
 The initial input size is 640 pixels. The loader applies aspect-ratio-preserving
 resize/letterbox and scales RGB intensities to [0, 1]; no separate dataset
@@ -259,16 +261,23 @@ validation. A 416-pixel comparison may be made if compute permits.
 
 ## Training-only augmentation
 
-| Transformation | Baseline setting | Rationale |
-| --- | --- | --- |
-| Horizontal flip | Probability 0.5 | Vary object orientation |
-| Translation | 0.1 | Reduce reliance on fixed object position |
-| Scaling | 0.2 | Moderate size variation while limiting additional shrinking |
-| HSV hue/saturation/value | 0.015 / 0.3 / 0.2 | Moderate color and illumination variation |
-| Rotation, vertical flip, shear, perspective | Disabled | Keep the initial transformation policy simple |
-| Mosaic, mixup, copy-paste | Disabled | Keep the baseline to whole, unmixed photos; mosaic is the first planned experiment |
+| Transformation | Baseline setting | Final model | Rationale |
+| --- | --- | --- | --- |
+| Horizontal flip | Probability 0.5 | 0.5 | Vary object orientation |
+| Translation | 0.1 | 0.1 | Reduce reliance on fixed object position |
+| Scaling | 0.2 | 0.5 | Size variation; the check below shows how much it shrinks objects |
+| HSV hue/saturation/value | 0.015 / 0.3 / 0.2 | 0.015 / 0.7 / 0.4 | Color and illumination variation |
+| Rotation, vertical flip | Disabled | 10 degrees, probability 0.5 | Waste lies in any orientation on a belt or pile |
+| Shear, perspective | Disabled | Disabled | Not needed for top-down photos |
+| Mosaic | Disabled | 1.0, off for the last 10 epochs | More objects and contexts per sample; does not shrink objects (check below) |
+| Mixup, copy-paste | Disabled | Disabled | Would blend materials, which the labels do not describe |
 
-These are baseline design choices, not tuned results. Validation and test use
+The baseline settings were first design choices. The final settings were
+compared with them in one training run on the same split and selected on
+validation (mAP50–95 44.2% → 51.2%); see
+[Task 2](../task-2/README.md#final-model-stronger-training-recipe). Several
+settings changed together (augmentation and batch size), so the gain belongs
+to the recipe as a whole, not to one setting. Validation and test use
 deterministic preprocessing without random training augmentation.
 
 **Checked after training: what the augmentation does to object sizes.** The
@@ -289,9 +298,9 @@ every box in pixels of the 640-pixel network input (no training involved):
   photos keeps its full 640-pixel scale on a 1,280-pixel canvas, and a
   640-pixel window is cropped from it. It shows parts of several photos (more
   boxes per sample) rather than smaller objects. The concern that led us to
-  turn mosaic off is therefore not supported; whether mosaic improves
-  accuracy can only be answered by a training run, which is the first planned
-  experiment ([training review](../task-2/training-review.md)).
+  turn mosaic off is therefore not supported. The training run with mosaic and
+  stronger augmentation then improved validation mAP50–95 from 44.2% to 51.2%
+  ([Task 2](../task-2/README.md#final-model-stronger-training-recipe)).
 
 ![16 random training images after the baseline augmentation](figures/augmented_training_batch.jpg)
 
@@ -306,9 +315,9 @@ The implementation is [train_detector.py](../train_detector.py).
 | Setting | Initial value | Reason |
 | --- | --- | --- |
 | Initialization | COCO-pretrained YOLO26s; fine-tune all layers | Transfer learned visual features |
-| Maximum epochs | 60 | Upper training budget, not a required duration (the run used all 60; best epoch 57) |
+| Maximum epochs | 60 | Upper training budget, not a required duration (baseline: best epoch 57; final model: best epoch 50) |
 | Early stopping | Patience 20 | Stop after sustained lack of validation fitness improvement |
-| Batch size | 4 | Conservative starting point for 8 GB VRAM; reduce to 2 if necessary |
+| Batch size | 4 (baseline), 16 (final model) | 4 was a conservative start for 8 GB VRAM; the final model was trained with 16 on a larger GPU |
 | GPU / mixed precision | Device 0 / AMP enabled | Use available GPU while limiting memory demand |
 | Data workers | 2 | Conservative Windows loading configuration |
 | Seed / deterministic option | 42 / enabled | Improve repeatability; not a cross-platform identity guarantee |

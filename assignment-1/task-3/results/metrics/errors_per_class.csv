@@ -1,7 +1,7 @@
 class,gt_objects,detected_correctly,wrong_class,missed,false_alarms
-biodegradable,6805,3327,33,3445,997
-cardboard,703,392,24,287,343
-glass,1165,763,37,365,127
-metal,875,564,42,269,162
-paper,658,390,27,241,180
-plastic,892,453,50,389,236
+biodegradable,6805,3814,13,2978,997
+cardboard,703,410,9,284,99
+glass,1165,789,44,332,117
+metal,875,634,19,222,164
+paper,658,396,22,240,85
+plastic,892,542,47,303,154

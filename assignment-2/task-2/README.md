@@ -44,7 +44,7 @@ Eligible crops per class:
 | paper | 2,797 | 7.1% | 633 | 625 | 264 |
 | plastic | 3,626 | 9.2% | 764 | 770 | 215 |
 
-The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same split, run at 640 pixels with `max_det = 400` (`assignment-1/train_detector.py`). The selected checkpoint (best of 60 epochs on validation) reaches, on the 1,569 test images and 11,098 test boxes, precision 74.9%, recall 54.6%, mAP50 61.9% and mAP50-95 44.5% (`assignment-1/task-2/README.md`). Its recall is lowest for biodegradable (43.5%) and plastic (48.5%) and highest for glass (64.6%).
+The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same split, run at 640 pixels with `max_det = 400` (`assignment-1/train_detector.py`). The final checkpoint (trained with the stronger recipe of Assignment 1, best of 60 epochs on validation) reaches, on the 1,569 test images and 11,098 test boxes, precision 78.6%, recall 63.1%, mAP50 72.3% and mAP50-95 51.8% (`assignment-1/task-2/README.md`). Its recall is lowest for biodegradable (57.1%) and cardboard (57.9%) and highest for metal (71.0%) and glass (69.2%).
 
 ### 0.3 Three rules carried over from Task 1
 
@@ -173,7 +173,7 @@ In all four measurements, distances between crops of the same split exclude crop
 
 ### 4.1 Protocol
 
-- **Boxes.** Queries are the ground-truth boxes of the test split, cropped as in section 0.1, not the detector's boxes. The embedding is evaluated on its own; detector errors are measured in Assignment 1. (With a test recall of 54.6%, and only 43.5% for biodegradable, almost half of the test objects would otherwise be missing from the evaluation, and unevenly across classes.) A second, end-to-end figure on detector boxes can be reported separately, matching detections to ground truth by IoU, as for detection mAP (deck 04, slide 69; PDF page 68).
+- **Boxes.** Queries are the ground-truth boxes of the test split, cropped as in section 0.1, not the detector's boxes. The embedding is evaluated on its own; detector errors are measured in Assignment 1. (With a test recall of 63.1%, and only 57.1% for biodegradable, more than a third of the test objects would otherwise be missing from the evaluation, and unevenly across classes.) A second, end-to-end figure on detector boxes can be reported separately, matching detections to ground truth by IoU, as for detection mAP (deck 04, slide 69; PDF page 68).
 - **Queries and gallery.** 8,353 eligible test crops as queries against the 39,574 training crops as gallery, after the duplicate correction (rule 2 in section 0.3).
 - **One test run.** `k`, `tau`, `delta`, the t-SNE settings and any comparison between models are decided on validation queries (8,276 eligible crops) against the same gallery. The test numbers are computed once at the end. This is the same rule as in Assignment 1.
 
@@ -251,7 +251,7 @@ Crops from one photo are not independent (same light, same background, often the
 - **Labels as ground truth.** All metrics measure agreement with the labels. The class names are confirmed by the dataset's `data.yaml` (Task 1, section 1.1), but the boundary between paper and cardboard labels is fuzzy. A part of the measured "error" may be label error, which is why the inspection steps in sections 2.4 and 3 are part of the method.
 - **Closed set.** All six classes are seen in training. The "unknown" answer of section 2.3 is tuned on validation crops of the known classes only, so how well it rejects truly new materials can only be checked with examples of such materials, which the dataset does not contain.
 - **Remaining duplicates.** Duplicates that neither duplicate search found can still link test and training images and make all scores slightly optimistic (Task 1, section 6.1).
-- **Detector dependence in use.** The quantitative evaluation uses ground-truth boxes. In operation, retrieval and assignment can only be as good as the detector's boxes: the final YOLO26s finds 54.6% of the test objects, so in an end-to-end system about half of the objects would never reach the embedding, and biodegradable and plastic objects would be missed most often.
+- **Detector dependence in use.** The quantitative evaluation uses ground-truth boxes. In operation, retrieval and assignment can only be as good as the detector's boxes: the final YOLO26s finds 63.1% of the test objects, so in an end-to-end system more than a third of the objects would never reach the embedding, and biodegradable and cardboard objects would be missed most often.
 
 ---
 

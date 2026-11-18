@@ -7,7 +7,8 @@ confidence threshold chosen on validation (0.25).
 - Recall of a group  = correctly detected ground-truth objects / objects in the group.
 - Precision of a group = correct predictions / predictions in the group.
 
-Groups:
+Groups (also written: recall per crowding level x image type, so the two can
+be compared at equal crowding):
 - size: COCO area bins on the 416 x 416 source image (small < 32^2 px,
   medium < 96^2 px, large otherwise); objects by their ground-truth box,
   predictions by their predicted box;
@@ -46,8 +47,9 @@ def image_type(path):
     return 'white background' if (border > 225).mean() >= 0.8 else 'scene'
 
 
-def breakdown(predictions, labels_dir):
+def breakdown(predictions, labels_dir, cross=None):
     # counts[(kind, group)] = [objects, objects found, predictions, correct predictions]
+    # cross[(crowding, image type)] = [images, objects, objects found], filled if given
     counts = defaultdict(lambda: [0, 0, 0, 0])
     images = defaultdict(int)
     for path, pb, pc, pcf in predictions:
@@ -57,6 +59,11 @@ def breakdown(predictions, labels_dir):
         image_groups = {'crowding': crowd_bin(len(gc)), 'image type': image_type(path)}
         for kind, group in image_groups.items():
             images[kind, group] += 1
+        if cross is not None:
+            cell = cross[image_groups['crowding'], image_groups['image type']]
+            cell[0] += 1
+            cell[1] += len(gc)
+            cell[2] += sum(status == 'TP' for status in gs)
         for box, status in zip(gb, gs):
             for key in [('size', size_bin(box, width, height))] + list(image_groups.items()):
                 counts[key][0] += 1
@@ -103,17 +110,26 @@ def main():
     data = assignment / 'data/processed'
     results = Path(__file__).with_name('results')
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--weights', default=str(assignment / 'models/yolo26s-best.pt'))
+    ap.add_argument('--weights', default=str(assignment / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--images', default=str(data / 'images/test'))
     ap.add_argument('--labels', default=str(data / 'labels/test'))
     ap.add_argument('--out', default=str(results / 'metrics/breakdowns_test.csv'))
     ap.add_argument('--figure', default=str(results / 'breakdowns_test.png'))
+    ap.add_argument('--cross-out', default=str(results / 'metrics/recall_crowding_imagetype_test.csv'))
     ap.add_argument('--conf', type=float, default=0.25, help='chosen on validation by select_threshold.py')
     ap.add_argument('--device', default='0')
     a = ap.parse_args()
 
     paths = sorted(p for p in Path(a.images).iterdir() if p.suffix.lower() in IMG_EXT)
-    rows = breakdown(predict_all(a.weights, paths, 640, a.conf, a.device), a.labels)
+    cross = defaultdict(lambda: [0, 0, 0])
+    rows = breakdown(predict_all(a.weights, paths, 640, a.conf, a.device), a.labels, cross)
+    with open(a.cross_out, 'w', newline='') as fh:
+        w = csv.writer(fh)
+        w.writerow(['objects_per_image', 'image_type', 'images', 'objects', 'found', 'recall'])
+        for crowd in CROWD_ORDER:
+            for kind in TYPE_ORDER:
+                n_img, n_obj, found = cross[crowd, kind]
+                w.writerow([crowd, kind, n_img, n_obj, found, round(found / n_obj, 4) if n_obj else ''])
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     with open(a.out, 'w', newline='') as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0]))

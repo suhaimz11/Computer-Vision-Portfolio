@@ -1,0 +1,197 @@
+{
+ "test_images": 1569,
+ "reference_images": 8895,
+ "max_bits": 10,
+ "min_ncc": 0.9,
+ "test_images_with_a_copy": 16,
+ "already_known": 5,
+ "known_not_refound": [
+  "biodegradable1186_jpg.rf.b53b500a8a4f0814552287027dfc203b.jpg",
+  "biodegradable1526_jpg.rf.bc73c8bff90ea35f1dbe16867c8dcd0e.jpg",
+  "biodegradable1582_jpg.rf.ae6406324b8ac0bac7f29b1770b3a984.jpg",
+  "biodegradable169_jpg.rf.1185b9389a87066a2a4565e441ba2ed7.jpg",
+  "biodegradable1932_jpeg.rf.ea5b342c332a414517409071f2324ea5.jpg",
+  "biodegradable2067_jpeg.rf.409a2cec368987ec3a37f0a24cd2330c.jpg",
+  "biodegradable668_jpg.rf.1e0b708774083f496e29a63e3b696b63.jpg",
+  "glass1426_jpg.rf.b0337e1a3ad23b9f8117b2c3a928ff23.jpg",
+  "glass143_jpg.rf.eab0ecfe0dc440b248856f77c0119ef6.jpg",
+  "glass2373_jpg.rf.62a396ccf63cf70fe3592e4f4f28af87.jpg",
+  "glass2901_jpg.rf.fedd8a8ea6eff50e0f4bcf4c74d2ef87.jpg",
+  "metal173_jpg.rf.ff1491c36e5467144b3d7db6d65a476e.jpg",
+  "paper1759_jpeg.rf.d058f79a82f13417421ff8c42b9e288b.jpg",
+  "paper993_jpg.rf.e2e912d1f5f801528ae4f8ae945428c6.jpg",
+  "plastic109_jpg.rf.478adffb9784f865c27639eae5980abc.jpg",
+  "plastic1111_jpg.rf.dfbeb48d1dae5add6018629e219ce042.jpg",
+  "plastic3_jpg.rf.a41481691e4b5741e67c16486651f5f8.jpg",
+  "plastic716_jpg.rf.c0eaaca83d92cea6a25a4a098842375c.jpg"
+ ],
+ "new_test_images": [
+  "cardboard1662_jpg.rf.c8dd5a28f8d5adc25c504caf38bfdebe.jpg",
+  "cardboard221_jpg.rf.4cabfa678b37bc98f730e1e54db057f1.jpg",
+  "glass2237_jpg.rf.0f003fff9285b739b732dace084729f2.jpg",
+  "glass2473_jpg.rf.c2786c273a2701260c9089b93d14bf99.jpg",
+  "glass2555_jpg.rf.9b7cde33e6c8d6d47ae85a2444cd19d1.jpg",
+  "glass2699_jpg.rf.49d745987f4719786bd6352850268bb4.jpg",
+  "glass425_jpg.rf.4db08832b479c6207c143071e555ee4d.jpg",
+  "glass437_jpg.rf.6a1b7338bb23eba6d2495c43f0480308.jpg",
+  "metal1161_jpg.rf.c024a7ae0358df335a17d6722aab0d00.jpg",
+  "metal691_jpg.rf.b8a2f3c8bf40bac07fb8171908214ea3.jpg",
+  "plastic451_jpg.rf.1cb07097494161233aa1e9353dbb7ff0.jpg"
+ ],
+ "orientation_counts": {
+  "0": 3,
+  "1": 2,
+  "2": 2,
+  "3": 1,
+  "4": 4,
+  "5": 2,
+  "6": 0,
+  "7": 4
+ },
+ "pairs": [
+  {
+   "test_image": "cardboard1662_jpg.rf.c8dd5a28f8d5adc25c504caf38bfdebe.jpg",
+   "copy": "cardboard1337_jpg.rf.c8009a774c19125f0ce3e71d5c64d469.jpg",
+   "copy_split": "train",
+   "orientation": 1,
+   "hash_bits": 8,
+   "ncc": 0.916
+  },
+  {
+   "test_image": "cardboard221_jpg.rf.4cabfa678b37bc98f730e1e54db057f1.jpg",
+   "copy": "cardboard305_jpg.rf.ce2e4dda6a831e865bf6bb8ff0200ce9.jpg",
+   "copy_split": "val",
+   "orientation": 0,
+   "hash_bits": 8,
+   "ncc": 0.917
+  },
+  {
+   "test_image": "glass2237_jpg.rf.0f003fff9285b739b732dace084729f2.jpg",
+   "copy": "glass2195_jpg.rf.bcf412caff6315acf6b8c62cf26f3c9e.jpg",
+   "copy_split": "train",
+   "orientation": 0,
+   "hash_bits": 4,
+   "ncc": 0.928
+  },
+  {
+   "test_image": "glass2473_jpg.rf.c2786c273a2701260c9089b93d14bf99.jpg",
+   "copy": "glass2482_jpg.rf.275a7aa85b2090f0a7ff4eb8cb003eb6.jpg",
+   "copy_split": "train",
+   "orientation": 7,
+   "hash_bits": 10,
+   "ncc": 0.902
+  },
+  {
+   "test_image": "glass2555_jpg.rf.9b7cde33e6c8d6d47ae85a2444cd19d1.jpg",
+   "copy": "glass3120_jpg.rf.a02c30fff7d8e58e4610a7e36430d742.jpg",
+   "copy_split": "train",
+   "orientation": 4,
+   "hash_bits": 8,
+   "ncc": 0.93
+  },
+  {
+   "test_image": "glass2699_jpg.rf.49d745987f4719786bd6352850268bb4.jpg",
+   "copy": "glass3103_jpg.rf.107b716996c40c9918098af37a574bed.jpg",
+   "copy_split": "train",
+   "orientation": 1,
+   "hash_bits": 10,
+   "ncc": 0.901
+  },
+  {
+   "test_image": "glass276_jpg.rf.378e77ab397dba0dc994f2d6069b704d.jpg",
+   "copy": "glass287_jpg.rf.746d26464f75c0bcb981f92bbeca813a.jpg",
+   "copy_split": "train",
+   "orientation": 4,
+   "hash_bits": 8,
+   "ncc": 0.934
+  },
+  {
+   "test_image": "glass276_jpg.rf.378e77ab397dba0dc994f2d6069b704d.jpg",
+   "copy": "glass270_jpg.rf.3ffb90df11f8bccd7a599edced3403fc.jpg",
+   "copy_split": "train",
+   "orientation": 5,
+   "hash_bits": 10,
+   "ncc": 0.937
+  },
+  {
+   "test_image": "glass425_jpg.rf.4db08832b479c6207c143071e555ee4d.jpg",
+   "copy": "glass312_jpg.rf.6fe3eed508118fb107aa791653f423b9.jpg",
+   "copy_split": "val",
+   "orientation": 7,
+   "hash_bits": 10,
+   "ncc": 0.907
+  },
+  {
+   "test_image": "glass437_jpg.rf.6a1b7338bb23eba6d2495c43f0480308.jpg",
+   "copy": "glass3049_jpg.rf.55433b5fd2d6b0eae1cf9c6eb9921b17.jpg",
+   "copy_split": "train",
+   "orientation": 4,
+   "hash_bits": 8,
+   "ncc": 0.908
+  },
+  {
+   "test_image": "metal1161_jpg.rf.c024a7ae0358df335a17d6722aab0d00.jpg",
+   "copy": "metal1226_jpg.rf.8c117190a7c995850b4db568aa01acc8.jpg",
+   "copy_split": "train",
+   "orientation": 5,
+   "hash_bits": 10,
+   "ncc": 0.954
+  },
+  {
+   "test_image": "metal691_jpg.rf.b8a2f3c8bf40bac07fb8171908214ea3.jpg",
+   "copy": "metal1042_jpg.rf.38a13f92dedc2b4fcf7d48cf90fb0013.jpg",
+   "copy_split": "train",
+   "orientation": 3,
+   "hash_bits": 8,
+   "ncc": 0.941
+  },
+  {
+   "test_image": "metal708_jpg.rf.fab11a793baab3e9338a198db3b25198.jpg",
+   "copy": "metal764_jpg.rf.04ebfb22cb7cfa049bc786652823dc22.jpg",
+   "copy_split": "train",
+   "orientation": 0,
+   "hash_bits": 2,
+   "ncc": 0.99
+  },
+  {
+   "test_image": "metal708_jpg.rf.fab11a793baab3e9338a198db3b25198.jpg",
+   "copy": "metal846_jpg.rf.a04f221194905e535a6bfbba6b87622a.jpg",
+   "copy_split": "train",
+   "orientation": 2,
+   "hash_bits": 4,
+   "ncc": 0.916
+  },
+  {
+   "test_image": "paper2279_jpg.rf.769904fd52f03f159ebc816994ffaa2b.jpg",
+   "copy": "cardboard1269_jpg.rf.1fabacd8ffb89c4137e1da1183cb1042.jpg",
+   "copy_split": "train",
+   "orientation": 2,
+   "hash_bits": 2,
+   "ncc": 0.989
+  },
+  {
+   "test_image": "paper927_jpg.rf.7e7d54368797a8c87ab79e25af7f3f98.jpg",
+   "copy": "paper951_jpg.rf.569e08f2ce4b520a640f503d1ae228c2.jpg",
+   "copy_split": "train",
+   "orientation": 7,
+   "hash_bits": 6,
+   "ncc": 0.909
+  },
+  {
+   "test_image": "plastic451_jpg.rf.1cb07097494161233aa1e9353dbb7ff0.jpg",
+   "copy": "glass1158_jpg.rf.f860ac3696f0235ae770213feb9f055e.jpg",
+   "copy_split": "train",
+   "orientation": 7,
+   "hash_bits": 6,
+   "ncc": 0.95
+  },
+  {
+   "test_image": "plastic581_jpg.rf.d50c4d0865e9c91c5506d49d2c6b9970.jpg",
+   "copy": "plastic886_jpg.rf.c403e8f79580bd882eb58208d93bedb9.jpg",
+   "copy_split": "train",
+   "orientation": 4,
+   "hash_bits": 10,
+   "ncc": 0.94
+  }
+ ]
+}
