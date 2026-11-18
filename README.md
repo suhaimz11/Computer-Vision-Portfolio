@@ -29,6 +29,7 @@ earlier runs and evaluation protocol.
 | 1 | 3. Visualization and error analysis | [Nine annotated examples and error analysis](assignment-1/task-3/README.md) |
 | 2 | 1. Loss and sampling | [Theoretical proposal](assignment-2/task-1/README.md) |
 | 2 | 2. Embedding analysis and use | [Retrieval, classification and evaluation proposal](assignment-2/task-2/README.md) |
+| 1 and 2 | Presentation (15 min, both assignments) | [Slides as PDF](presentation/CV-Portfolio-1_Waste-Object-Detection.pdf) and [PowerPoint](presentation/CV-Portfolio-1_Waste-Object-Detection.pptx) |
 
 Model hashes and baseline
 checkpoints are documented in [models/README.md](assignment-1/models/README.md).
@@ -50,6 +51,7 @@ assignment-1/
 assignment-2/
   task-1/          Metric learning loss and sampling proposal
   task-2/          Embedding analysis and application proposal
+presentation/      Final slides (PDF and PowerPoint)
 ```
 
 Shared Assignment 1 data preparation scripts stay at its root. Recorded results
