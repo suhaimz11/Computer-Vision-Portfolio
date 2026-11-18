@@ -30,6 +30,7 @@ earlier runs and evaluation protocol.
 | 2 | 1. Loss and sampling | [Theoretical proposal](assignment-2/task-1/README.md) |
 | 2 | 2. Embedding analysis and use | [Retrieval, classification and evaluation proposal](assignment-2/task-2/README.md) |
 | 1 and 2 | Presentation (15 min, both assignments) | [Slides as PDF](presentation/CV-Portfolio-1_Waste-Object-Detection.pdf) and [PowerPoint](presentation/CV-Portfolio-1_Waste-Object-Detection.pptx) |
+| 1 and 2 | Contribution statement | [Contribution-Statement.pdf](Contribution-Statement.pdf) and the [section below](#contribution-statement) |
 
 Model hashes and baseline
 checkpoints are documented in [models/README.md](assignment-1/models/README.md).
@@ -118,6 +119,8 @@ repeating the final recipe. Recorded arguments and all 60 training epochs are in
 [strong-augmentation-run/](assignment-1/task-2/results/strong-augmentation-run/).
 
 ## Contribution statement
+
+Also available as a one-page PDF: [Contribution-Statement.pdf](Contribution-Statement.pdf).
 
 Suhaim and Lorena share responsibility for Assignment 1 through an equal allocation of 1.5 tasks each. Suhaim covers Task 1 and model training in Task 2. Lorena covers test evaluation in Task 2 and Task 3.
 
