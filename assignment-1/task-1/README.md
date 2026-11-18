@@ -7,7 +7,7 @@
 | Biodegradable has 61.3% of the 74,073 boxes; 10.3 times more boxes than the smallest class in training | Split balanced per class (image presence and box counts); per-class AP always reported; no oversampling until validation shows a need | [Split](#reproducible-trainvalidationtest-split), [Task 2](../task-2/README.md) |
 | 1 to 358 objects per image; 5,082 images hold one object, while the 5% most crowded images hold about half of all boxes | Detection cap `max_det=400` (checked: raising it to 500 changes test mAP50–95 by 0.03 points); results reported by crowding | [Parameters](#training-parameters-and-strategy), [Task 3](../task-3/README.md) |
 | 36.45% of boxes cover under 1% of the image | 640-pixel input instead of the native 416. The baseline used mild scaling (0.2) and no mosaic; a later check showed mosaic does not shrink objects, so the final model uses mosaic and stronger augmentation (test mAP50–95 44.5% → 51.8%) | [Preprocessing](#selected-detector-and-preprocessing), [augmentation](#training-only-augmentation) |
-| Flipped, rotated, cropped and recoloured copies of photos (364 candidate pairs reviewed, 267 groups) | Group-aware split keeps confirmed copies in one subset; remaining copies found later (29 test images, including 6 from an 8-orientation search) were measured (final model: test mAP50–95 51.8% with, 51.9% without) | [Duplicates](#duplicate-review-and-leakage-prevention) |
+| Initial review found 267 duplicate groups; later audits found 44 more groups crossing the split, and an 8-orientation search 6 more test images (29 affected test images in total) | Keep reviewed groups together, disclose remaining leakage, and evaluate again after excluding the affected test images (final model: mAP50–95 51.8% full, 51.9% after excluding all 29; baseline 44.5% and 44.7% after excluding 23) | [Duplicates](#duplicate-review-and-leakage-prevention) |
 | 17 zero-area boxes | Removed, logged and verified; every other box kept | [Cleaning](#annotation-cleaning) |
 | All images are 416 x 416 and decode correctly; no exact duplicates | Same letterbox preprocessing for every split; no image dropped | [Audit](#audit-results) |
 | File-name class differs from the labels in 133 images | Labels, not file names, are the ground truth; class names confirmed by the export's `data.yaml` | [File names](#file-names-versus-labels) |
@@ -142,11 +142,13 @@ are pair counts, not counts of removable images. The 23 different pairs are:
 Confirmed links were merged transitively into connected groups. If A matches B
 and B matches C, all three stay together. There are 267 non-singleton groups;
 the largest contains five images. Including singleton images gives 10,156
-independent allocation groups. No confirmed duplicate group crosses subsets.
+independent allocation groups. The original review-defined groups stay within
+one subset. The follow-up audit below found 44 additional groups crossing
+subsets, so the full split still contains known source leakage.
 Historical teammate lists supplied reference labels only; current review
 verdicts determined grouping. Unflagged images are not proven unique.
 
-**Duplicates outside the review.** A wider, independent duplicate search
+**Follow-up audit found 44 groups crossing the split.** A wider, independent duplicate search
 (307 groups, 664 images; [team-duplicates](../data/team-duplicates/README.md))
 was used only as reference labels, not for grouping. Merged with the confirmed
 pairs, 44 of its groups cross the split: 23 test images have a copy in
