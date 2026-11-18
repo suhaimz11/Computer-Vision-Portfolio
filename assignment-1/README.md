@@ -97,8 +97,8 @@ relative to `assignment-1/`; run commands from the repository root (see the
 | Task 1 · export | `export_yolo.py` | `data/split/`, `GarbageDataset/images/`, `data/prepared/labels/` | `data/processed/` with `data.yaml` |
 | Task 2 · train YOLO26s | `train_detector.py` | `data/processed/data.yaml`, `yolo26s.pt` | `runs/train/<name>/` (selected copy: `models/yolo26s-strongaug-best.pt`) |
 | Task 2 · train YOLOv5s | `yolov5/train.py` (+ `worker.py`) | `data/processed/`, YOLOv5 v7.0 code | `yolov5/runs/<run>/` (submitted copy: `models/yolov5s-best.pt`) |
-| Task 2 · full and filtered test | `task-2/evaluate_clean_test.py` | `models/`, `data/processed/`, `task-2/leaked-test-images-extended.csv` | `../runs/clean-test/results.json` |
-| Task 2 · confidence intervals | `task-2/bootstrap_test_ci.py` | `models/`, `data/processed/data.yaml` | `task-2/test-confidence-intervals.json` |
+| Task 2 · full and filtered test | `task-2/evaluate_clean_test.py` | `models/`, `data/processed/`, `task-2/results/leaked-test-images-extended.csv` | `../runs/clean-test/results.json` |
+| Task 2 · confidence intervals | `task-2/bootstrap_test_ci.py` | `models/`, `data/processed/data.yaml` | `task-2/results/test-confidence-intervals.json` |
 | Task 3 · threshold | `task-3/select_threshold.py` | `models/`, validation split | `task-3/results/metrics/threshold_selection_val.csv` |
 | Task 3 · examples and errors | `task-3/error_analysis.py` | `models/`, test split | `../runs/task3/` (checked-in copy: `task-3/results/`) |
 | Task 3 · breakdowns | `task-3/breakdowns.py` | `models/`, test split | `task-3/results/metrics/breakdowns_test.csv`, `breakdowns_test.png` |

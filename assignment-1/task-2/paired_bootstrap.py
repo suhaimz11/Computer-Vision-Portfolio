@@ -25,7 +25,7 @@ def main():
     ap.add_argument('--device', default='0', help="'0' for CUDA, 'mps' for Apple GPU, 'cpu'")
     ap.add_argument('--resamples', type=int, default=1000)
     ap.add_argument('--seed', type=int, default=42)
-    ap.add_argument('--out', type=Path, default=Path(__file__).with_name('paired-bootstrap.json'))
+    ap.add_argument('--out', type=Path, default=Path(__file__).parent / 'results' / 'paired-bootstrap.json')
     a = ap.parse_args()
 
     stats = {}

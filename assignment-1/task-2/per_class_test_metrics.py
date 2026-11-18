@@ -14,7 +14,7 @@ def main():
     ap.add_argument('--weights', default=str(base / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--data', type=Path, default=base / 'data/processed/data.yaml')
     ap.add_argument('--device', default='0', help="'0' for CUDA, 'mps' for Apple GPU, 'cpu'")
-    ap.add_argument('--out', type=Path, default=Path(__file__).with_name('test-per-class-metrics.json'))
+    ap.add_argument('--out', type=Path, default=Path(__file__).parent / 'results' / 'test-per-class-metrics.json')
     a = ap.parse_args()
 
     from ultralytics import YOLO
