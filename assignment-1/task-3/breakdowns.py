@@ -103,7 +103,7 @@ def main():
     data = assignment / 'data/processed'
     results = Path(__file__).with_name('results')
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--weights', default=str(assignment / 'models/yolo26s-best.pt'))
+    ap.add_argument('--weights', default=str(assignment / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--images', default=str(data / 'images/test'))
     ap.add_argument('--labels', default=str(data / 'labels/test'))
     ap.add_argument('--out', default=str(results / 'metrics/breakdowns_test.csv'))
