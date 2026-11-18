@@ -52,7 +52,7 @@ def metrics(per_image, index):
 def main():
     base = Path(__file__).resolve().parents[1]
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--weights', default=str(base / 'models/yolo26s-best.pt'))
+    ap.add_argument('--weights', default=str(base / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--data', type=Path, default=base / 'data/processed/data.yaml')
     ap.add_argument('--device', default='0', help="'0' for CUDA, 'mps' for Apple GPU, 'cpu'")
     ap.add_argument('--resamples', type=int, default=1000)

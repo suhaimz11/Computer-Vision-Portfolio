@@ -41,7 +41,7 @@ def link_subset(source, target, keep):
 def main():
     base = Path(__file__).resolve().parents[1]
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('--weights', default=str(base / 'models/yolo26s-best.pt'))
+    ap.add_argument('--weights', default=str(base / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--data', type=Path, default=base / 'data/processed')
     ap.add_argument('--leaked', type=Path, default=Path(__file__).with_name('leaked-test-images.csv'))
     ap.add_argument('--work', type=Path, default=base.parent / 'runs/clean-test')
