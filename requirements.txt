@@ -1,0 +1,7 @@
+# Everything needed to reproduce Assignment 1 (audit, split, export, training,
+# evaluation and Task 3). Install from the repository root:
+#   python -m pip install -r requirements.txt
+# The training pins are the exact versions used for the submitted models
+# (Windows x86-64, CUDA 12.8). On a machine without CUDA see the README.
+-r assignment-1/requirements-audit.txt
+-r assignment-1/requirements-training.txt

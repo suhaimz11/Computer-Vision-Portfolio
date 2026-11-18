@@ -32,8 +32,45 @@ the checkpoint path.
 
 Both tasks are theoretical.
 
+## Reproduce Assignment 1
+
+Every command runs from the repository root (PowerShell shown; on macOS or
+Linux use `source .venv/bin/activate` and forward slashes). Steps 1 to 4 need
+no GPU; step 5 needs a CUDA GPU (about 8 GB); steps 6 and 7 run on CPU with
+`device=cpu` / `--device cpu`, only slower.
+
+| Step | Command | Output |
+| --- | --- | --- |
+| 0. Environment (once) | `py -m venv .venv`, `.\.venv\Scripts\Activate.ps1`, `python -m pip install -r requirements.txt` | Python 3.14.4, PyTorch 2.11.0+cu128, Ultralytics 8.4.208 |
+| 1. Dataset | Put the course's Garbage Detection Dataset (YOLO format) in `assignment-1/GarbageDataset/images/` and `assignment-1/GarbageDataset/labels/` | 10,464 images, 416 x 416 |
+| 2. Tests and audit | `python -m unittest discover -s assignment-1/tests -v`, then `python assignment-1/audit_dataset.py` | `assignment-1/reports/audit.json` |
+| 3. Cleaned labels | `python assignment-1/rebuild_prepared_labels.py` | `assignment-1/data/prepared/labels/`: the originals minus the 17 zero-area rows in `removed_rows.txt` |
+| 3b. Check the split | `python assignment-1/prepare_split.py --output assignment-1/data/split-check` | Same rows as the committed `assignment-1/data/split/manifest.csv` (seed 42); only line endings may differ |
+| 4. Export for YOLO | `python assignment-1/export_yolo.py` | `assignment-1/data/processed/` with `data.yaml` (train / val / test) |
+| 5. Train (optional) | Download `yolo26s.pt` into `assignment-1/`, then `cd assignment-1` and `python train_detector.py` | `assignment-1/runs/train/yolo26s_baseline/` |
+| 6. Test evaluation (Task 2) | `yolo detect val model=assignment-1/models/yolo26s-best.pt data=assignment-1/data/processed/data.yaml split=test imgsz=640 max_det=400` | Test precision, recall, mAP50, mAP50-95 and per-class AP |
+| 7. Error analysis (Task 3) | `python assignment-1/task-3/error_analysis.py` | `runs/task3/` with example images and metrics |
+
+Skip step 5 to reproduce the reported results with the submitted checkpoint.
+Step 6 should print test mAP50 61.9% and mAP50-95 44.5% (see
+[Task 2](assignment-1/task-2/README.md)); small differences can come from a
+different GPU or PyTorch build. The YOLOv5s baseline is trained and validated
+with its own launcher, described in [yolov5/README.md](assignment-1/yolov5/README.md).
+
+Without CUDA, install PyTorch for your platform from https://pytorch.org first,
+then `python -m pip install -r assignment-1/requirements-audit.txt ultralytics==8.4.208`.
+
 ## Local setup and submission
 
 The trained checkpoints are in [`assignment-1/models/`](assignment-1/models/README.md) (final model: YOLO26s). The dataset and virtual environment are stored locally. See the [Assignment 1 setup](assignment-1/README.md#setup) for dataset placement and dependencies. Run the local tests from the repository root with `python -m unittest discover -s assignment-1/tests -v`.
 
-The submission also requires a short presentation covering both assignments, and a statement identifying each group member's contribution.
+The submission also requires a short presentation covering both assignments.
+
+## Contribution statement
+
+| Member | Primary responsibility | Main contributions |
+| --- | --- | --- |
+| Pavin Sumathi Palanichamy | Assignment 2, Task 1: loss function and sampling strategy | Chose and justified the triplet loss with a margin on L2-normalised crop embeddings; designed the online, class-balanced 6 x K batch sampling, the image-first crop drawing, the 24-pixel minimum crop size, the duplicate-aware triplet rules and the warm-up plus semi-hard negative mining; analysed the dataset properties behind each choice and discussed how sampling shapes training and the embedding space ([Task 1](assignment-2/task-1/README.md)). Also contributed to Assignment 1: the leakage audit and leak-free test score, confidence intervals, validation-based threshold selection, error breakdowns, the augmentation check, the reproduction guide and submitting the trained models. |
+| Prethebha Muthukumaran | Assignment 2, Task 2: analysis and use of the learned embedding space | Designed the retrieval of similar waste objects from detector crops, the class-balanced k-nearest-neighbour assignment of unknown samples with "unknown" and "uncertain" answers, the visualisation and structural analysis of the space (PCA, t-SNE, distance and confusion matrices, silhouette), and the quantitative evaluation (Recall@K, MAP@R, macro-F1, chance levels, breakdowns and bootstrap intervals) ([Task 2](assignment-2/task-2/README.md)). Reviewed and merged the Assignment 2 Task 1 pull request. |
+
+The remaining members' rows will be added before submission.

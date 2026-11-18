@@ -14,6 +14,16 @@ confidence). Each prediction is then one of:
 
 A ground-truth object with no matching prediction is **missed**.
 
+**Why confidence 0.25.** The threshold was chosen on the validation split,
+not on test: [select_threshold.py](select_threshold.py) predicts the 1,570
+validation images once and scores thresholds from 0.05 to 0.90 with the same
+matching rule as below. F1 is highest at 0.25 (precision 72.4%, recall 54.7%,
+F1 62.3%) and nearly flat around it (61.9% at 0.20, 61.7% at 0.30); lower
+thresholds add many false alarms, higher ones lose many objects
+([full sweep](results/metrics/threshold_selection_val.csv)). The test split was
+then analysed once at that threshold. The mAP values in Task 2 do not depend on
+this threshold.
+
 Colour code in the figures: green = ground truth, blue = correct,
 red = wrong class, orange = false alarm, yellow = missed ground truth.
 
@@ -89,7 +99,7 @@ predictions that overlap a dataset box at IoU >= 0.5 but have a different class.
 
 ![Wrong-class prediction](results/predictions/incorrect/glass956_jpg.rf.3b34a1b57d414600ad580491ae64446b.jpg)
 
-Four objects annotated as glass are predicted as metal, with confidence 0.81�0.91. Their reflective appearance makes the material visually ambiguous, so the annotation should also be checked.
+Four objects annotated as glass are predicted as metal, with confidence 0.81–0.91. Their reflective appearance makes the material visually ambiguous, so the annotation should also be checked.
 
 ![Wrong-class prediction](results/predictions/incorrect/paper1160_jpg.rf.cdce4a52a1a3fe24ead81115c614c72b.jpg)
 
@@ -98,6 +108,78 @@ Two objects annotated as paper in the takeaway-cup image are predicted as metal,
 ![Wrong-class prediction](results/predictions/incorrect/plastic256_jpg.rf.08555728a98b826954a24ff45bd73749.jpg)
 
 Two objects annotated as plastic are predicted as glass, with confidence 0.54 and 0.25. Transparent packaging can make these materials difficult to distinguish.
+
+## Where the model succeeds and fails
+
+To test the explanations below with numbers, the test predictions (same
+model, threshold 0.25 and matching rule) were split three ways
+([breakdowns.py](breakdowns.py), [table](results/metrics/breakdowns_test.csv)).
+Recall is the share of objects found with the right class; precision is the
+share of predictions that are correct.
+
+![Recall and precision by object size, crowding and image type](results/breakdowns_test.png)
+
+| Breakdown | Group | Images | Objects | Recall | Precision |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Object size | small (< 32 x 32 px) | | 3,002 | 26.0% | 61.8% |
+| | medium | | 4,347 | 53.3% | 68.1% |
+| | large (>= 96 x 96 px) | | 3,749 | 74.4% | 80.6% |
+| Objects per image | 1 | 763 | 763 | 91.3% | 78.5% |
+| | 2–5 | 447 | 1,257 | 73.8% | 77.4% |
+| | 6–20 | 242 | 2,462 | 63.4% | 71.4% |
+| | more than 20 | 117 | 6,616 | 40.8% | 70.1% |
+| Image type | white background (product photo) | 539 | 1,753 | 71.2% | 78.7% |
+| | scene | 1,030 | 9,345 | 49.6% | 70.9% |
+
+- **Size is the strongest factor.** Only a quarter of small objects are found,
+  against three quarters of large ones. Precision falls less (62% vs 81%):
+  small objects are mostly missed, not mistaken.
+- **Crowding comes next.** A single object is found 91% of the time; in
+  images with more than 20 objects, 41%. Those 117 images hold 60% of all test
+  objects, which is why overall recall is only about 55%.
+- **Image type matters less than it first appears.** Scenes look much harder
+  (50% vs 71% recall), but they are also far more crowded. At the same
+  crowding level the gap shrinks to 4–12 points (single object: 94% vs 90%;
+  6–20 objects: 73% vs 60%), so clutter explains most of it and the background
+  only the rest.
+
+Sizes use COCO area bins on the 416-pixel source images. An image counts as
+a white-background photo when at least 80% of a thin border strip is
+near-white. Computed on an Apple M4 Pro GPU: totals match the CUDA run above
+to within 2 objects and 15 false alarms.
+
+## What the false alarms and misses really are
+
+"False alarm" and "missed" above are strict: a box counts only with IoU of at
+least 0.5. [error_types.py](error_types.py) keeps that matching and explains
+each leftover prediction and object by the box it overlaps most
+([table per class](results/metrics/error_types_test.csv)).
+
+| Error | Type | Count | Share | Meaning |
+| --- | --- | ---: | ---: | --- |
+| False alarm | imprecise box | 1,242 | 61% | right class on a real object, but IoU 0.1–0.5 (box too loose or too tight) |
+| | background | 529 | 26% | IoU below 0.1 with every annotated object |
+| | duplicate | 191 | 9% | a second box on an object that was already found |
+| | other class | 68 | 3% | partly overlaps an object of another class |
+| Missed object | not detected | 3,311 | 66% | no right-class box anywhere near it |
+| | nearly found | 1,687 | 34% | a right-class box overlaps it, but only with IoU 0.1–0.5 |
+
+- **Most false alarms are localisation errors, not phantom objects.** 61% sit
+  on a real object of the right class with a box that is not tight enough;
+  only about a quarter fire on unannotated background. Biodegradable accounts
+  for 641 of the 1,242 imprecise boxes, which supports the explanation that
+  its irregular, overlapping objects have unclear boundaries.
+- **A third of the missed objects were nearly found.** For 1,687 objects the
+  model put a box of the right class on them but missed the 0.5 overlap. Better
+  localisation (or a looser IoU criterion) would recover many of these; the
+  other two thirds need better detection, mainly of small objects in piles.
+- **Cardboard's high false-alarm count** (343 for 703 objects) is mostly
+  imprecise boxes (212), consistent with piles where individual boxes are
+  hard to delimit.
+
+Background false alarms may also include objects the annotators did not label;
+this was not checked image by image. Counts are from the Apple M4 Pro re-run
+(2,030 false alarms and 4,998 missed objects, against 2,045 and 4,996 above).
 
 ## Analysis of the errors
 
@@ -124,6 +206,18 @@ Two objects annotated as plastic are predicted as glass, with confidence 0.54 an
    materials that share colour, texture, transparency or reflection, or objects
    whose appearance is dominated by a different material (a can with a paper
    label).
+
+   **Lids and caps are a likely source of glass–metal confusion.** Glass photos
+   often show a jar or bottle whose metal lid or cap is labelled as a separate
+   metal object: 574 of the 2,649 glass-named images contain both glass and
+   metal boxes, and 13.7% of all boxes in glass photos are metal. These metal
+   boxes are small (median 38 px, against 116 px for metal objects in metal
+   photos), and in the examples below they sit directly on the glass object.
+   All six random examples (glass images with at most 8 boxes; blue = glass,
+   red = metal) are lids or caps. Whether the 17 test glass→metal confusions
+   are caps was not checked one by one.
+
+   ![Glass jars and bottles with their metal lids and caps labelled separately](results/glass_lids_caps.jpg)
 
 ## Limitations of the final model
 

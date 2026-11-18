@@ -196,7 +196,8 @@ def main():
     ap.add_argument("--out", default=str(output / "predictions"))
     ap.add_argument("--metrics", default=str(output / "metrics"))
     ap.add_argument("--imgsz", type=int, default=640)
-    ap.add_argument("--conf", type=float, default=0.25)
+    ap.add_argument("--conf", type=float, default=0.25,
+                    help="chosen on validation by select_threshold.py (best F1)")
     ap.add_argument("--device", default="0")
     ap.add_argument("--examples", type=int, default=3, help="examples per case")
     a = ap.parse_args()

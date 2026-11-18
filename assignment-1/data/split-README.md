@@ -22,7 +22,10 @@ labels are not used as verdicts. Undetected duplicate sources remain possible.
 
 Final image counts: train 7,325; validation 1,570; test 1,569. All six class IDs
 appear in each subset. There are 267 non-singleton duplicate groups (largest:
-five images), with no confirmed group crossing subsets. All 10,464 images are
+five images), with no confirmed group crossing subsets. Duplicates found only by
+the wider team search are not grouped: 44 such groups cross subsets (23 test images have
+a copy in training or validation, 26 validation images a copy in training); their effect on the test score
+is reported in [Task 2](../task-2/README.md#test-score-without-leaked-duplicates). All 10,464 images are
 retained. The 74,073 valid boxes are preserved; only 17 zero-area rows are removed.
 
 `summary.json` records actual counts, class coverage, dependency version and
@@ -44,6 +47,6 @@ an `export-report.json`. Existing destinations are refused; a failed partial
 export has no completion report. Use `--output` for a fresh destination.
 
 The dataset copies and local verification split are excluded from Git. Source
-data stays unchanged. YAML class names use the working repository mapping and
-still need publisher confirmation. Keep the test subset fixed and use
+data stays unchanged. YAML class names follow the export's own `data.yaml`
+(biodegradable, cardboard, glass, metal, paper, plastic for ids 0 to 5). Keep the test subset fixed and use
 validation only for tuning and checkpoint selection.

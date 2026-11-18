@@ -1,0 +1,7 @@
+error,type,total,biodegradable,cardboard,glass,metal,paper,plastic
+false alarm,duplicate,191,54,25,24,31,29,28
+false alarm,imprecise box,1242,641,212,83,71,95,140
+false alarm,other class,68,13,10,5,14,20,6
+false alarm,background,529,287,93,13,43,33,60
+missed object,nearly found,1687,1121,173,75,78,102,138
+missed object,not detected,3311,2326,114,290,192,137,252

@@ -79,19 +79,34 @@ Dataset images and feature caches are local; this specific preview set is versio
 
 ## Structure
 
-```text
-assignment-1/
-  audit_dataset.py          Dataset integrity and annotation checks
-  sample_annotations.py     Random annotation previews
-  check_duplicates.py       Run the teammate's five pipeline stages
-  duplicates/passC/         Teammate's pipeline with portable path configuration
-  data/team-duplicates/     Teammate's supplied result CSVs
-  data/prepared/            Removal log and local cleaned label copies
-  GarbageDataset/           Original dataset; local only
-  reports/                  Findings and local generated reviews
-  tests/                    Dataset audit tests
-  local-archive/            Our superseded duplicate checker; local only
-```
+Every script, in pipeline order, with what it reads and writes. Paths are
+relative to `assignment-1/`; run commands from the repository root (see the
+[reproduction table](../README.md#reproduce-assignment-1)).
+
+| Stage | Script | Reads | Writes |
+| --- | --- | --- | --- |
+| Task 1 · audit | `audit_dataset.py` | `GarbageDataset/` | `reports/audit.json` |
+| Task 1 · visual check | `sample_annotations.py` | `GarbageDataset/` | local preview images and a review checklist |
+| Task 1 · duplicates | `check_duplicates.py` → `duplicates/passC/c1`–`c5` ([stages](duplicates/README.md)) | `GarbageDataset/images/` | `reports/team-duplicates-run*/verified2.csv`, `verified3.csv` |
+| Task 1 · duplicate review | `preview_duplicates.py` | latest `verified3.csv` | `reports/duplicate-review/` (`review.csv`, previews) |
+| Task 1 · label check | `check_name_label_mismatch.py` | `data/prepared/labels/`, `data/split/manifest.csv` | `reports/name-label-mismatches.csv` |
+| Task 1 · cleaned labels | `rebuild_prepared_labels.py` | `GarbageDataset/labels/`, `data/prepared/removed_rows.txt` | `data/prepared/labels/` |
+| Task 1 · split | `prepare_split.py` | `GarbageDataset/`, `data/prepared/`, `review.csv` | `data/split/manifest.csv`, `summary.json` |
+| Task 1 · export | `export_yolo.py` | `data/split/`, `GarbageDataset/images/`, `data/prepared/labels/` | `data/processed/` with `data.yaml` |
+| Task 2 · train YOLO26s | `train_detector.py` | `data/processed/data.yaml`, `yolo26s.pt` | `runs/train/<name>/` (submitted copy: `models/yolo26s-best.pt`) |
+| Task 2 · train YOLOv5s | `yolov5/train.py` (+ `worker.py`) | `data/processed/`, YOLOv5 v7.0 code | `yolov5/runs/<run>/` (submitted copy: `models/yolov5s-best.pt`) |
+| Task 2 · leak-free test | `task-2/evaluate_clean_test.py` | `models/`, `data/processed/`, `task-2/leaked-test-images.csv` | `../runs/clean-test/results.json` |
+| Task 2 · confidence intervals | `task-2/bootstrap_test_ci.py` | `models/`, `data/processed/data.yaml` | `task-2/test-confidence-intervals.json` |
+| Task 3 · threshold | `task-3/select_threshold.py` | `models/`, validation split | `task-3/results/metrics/threshold_selection_val.csv` |
+| Task 3 · examples and errors | `task-3/error_analysis.py` | `models/`, test split | `../runs/task3/` (checked-in copy: `task-3/results/`) |
+| Task 3 · breakdowns | `task-3/breakdowns.py` | `models/`, test split | `task-3/results/metrics/breakdowns_test.csv`, `breakdowns_test.png` |
+| Task 3 · error types | `task-3/error_types.py` | `models/`, test split | `task-3/results/metrics/error_types_test.csv` |
+| Tests | `tests/` | small synthetic files | — |
+
+Folders: `GarbageDataset/` (original data, local only), `data/` (split,
+duplicate lists, removal log), `models/` (submitted checkpoints), `reports/`
+(audit, duplicate review, label check), `task-1/` to `task-3/` (reports and
+their scripts), `duplicates/passC/` (duplicate-search stages).
 
 Datasets, caches, old/generated review runs and local archives are excluded from Git.
 The current 364-pair preview set, code, supplied result CSVs and findings are versioned.
@@ -148,8 +163,9 @@ experimental results. Small batches may use gradient accumulation internally.
 
 Training-only augmentation: horizontal flips 0.5, translation 0.1, scaling 0.2,
 and HSV gains 0.015/0.3/0.2. Rotation, vertical flips, shear, perspective,
-mosaic, mixup and copy-paste are disabled for the initial baseline to limit
-additional shrinking of small objects. Inspect the resulting boxes before
+mosaic, mixup and copy-paste are disabled for the initial baseline. A later
+check showed mosaic does not shrink objects in Ultralytics (see the
+[Task 1 augmentation check](task-1/README.md#training-only-augmentation)). Inspect the resulting boxes before
 full training. Validation and test use deterministic preprocessing.
 
 The detection cap is 400 for crowded images (up to 358 annotated objects).
@@ -160,7 +176,8 @@ Report final test mAP50-95, mAP50, per-class AP, precision and recall with
 `max_det=400`. Test evaluation is separate from this training script. Review
 correct, missed and incorrect detections, including small and crowded objects.
 No oversampling initially; consider balancing only if validation supports it.
-Class names remain the provisional repository mapping.
+Class names (ids 0 to 5: biodegradable, cardboard, glass, metal, paper, plastic) are
+confirmed by the dataset export's `data.yaml`.
 
 References: [YOLO26](https://docs.ultralytics.com/models/yolo26) and
 [training arguments](https://docs.ultralytics.com/modes/train).
@@ -188,6 +205,5 @@ fixed split with cleaned labels into `data/processed/` and generate `data.yaml`.
 Every copied image and label is checked against its source. Existing output
 folders are refused. See the split documentation linked above for details.
 
-Next: confirm official class names and lecture coverage, inspect available
-hardware, pin YOLO26-compatible Ultralytics and dependencies, save the runnable hyperparameters and
-launch command, then inspect augmented batches and run a training smoke check.
+All of these steps are done; see the [reproduction table](../README.md#reproduce-assignment-1)
+for the complete order of commands.
