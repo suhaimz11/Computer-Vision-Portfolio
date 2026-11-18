@@ -1,0 +1,50 @@
+{
+  "full": {
+    "images": 1569,
+    "boxes": 11098,
+    "precision": 0.7857,
+    "recall": 0.6309,
+    "mAP50": 0.7225,
+    "mAP50-95": 0.5181,
+    "per_class_AP50-95": {
+      "biodegradable": 0.3768,
+      "cardboard": 0.5283,
+      "glass": 0.6012,
+      "metal": 0.5794,
+      "paper": 0.5577,
+      "plastic": 0.4654
+    }
+  },
+  "clean": {
+    "images": 1546,
+    "boxes": 10932,
+    "precision": 0.788,
+    "recall": 0.6317,
+    "mAP50": 0.7226,
+    "mAP50-95": 0.5194,
+    "per_class_AP50-95": {
+      "biodegradable": 0.3763,
+      "cardboard": 0.5274,
+      "glass": 0.599,
+      "metal": 0.5761,
+      "paper": 0.5545,
+      "plastic": 0.4829
+    }
+  },
+  "leaked": {
+    "images": 23,
+    "boxes": 166,
+    "precision": 0.8918,
+    "recall": 0.7698,
+    "mAP50": 0.8781,
+    "mAP50-95": 0.7497,
+    "per_class_AP50-95": {
+      "biodegradable": 0.4282,
+      "cardboard": 0.995,
+      "glass": 0.9089,
+      "metal": 0.9387,
+      "paper": 0.9285,
+      "plastic": 0.2988
+    }
+  }
+}

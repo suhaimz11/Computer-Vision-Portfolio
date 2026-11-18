@@ -191,7 +191,7 @@ each leftover prediction and object by the box it overlaps most
 - **Two fifths of the missed objects were nearly found.** For 1,746 objects the
   model put a box of the right class on them but missed the 0.5 overlap. Better
   localisation (or a looser IoU criterion) would recover many of these; the
-  other two thirds need better detection, mainly of small objects in piles.
+  other three fifths need better detection, mainly of small objects in piles.
 - **Cardboard false alarms almost disappeared** with the stronger recipe (343
   to 99 for 703 objects); the baseline's were mostly imprecise boxes on piles
   of boxes.

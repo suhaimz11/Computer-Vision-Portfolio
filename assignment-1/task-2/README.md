@@ -49,16 +49,16 @@ to 60: the model had converged, so longer training would not help.
 | --- | ---: | ---: | ---: | ---: | --- |
 | Baseline | 74.9% | 54.6% | 61.9% | 44.5% | 41.6% – 48.8% |
 | **Final model** | **78.6%** | **63.1%** | **72.3%** | **51.8%** | **48.7% – 56.0%** |
-| Final model, leaked duplicates removed (1,546 images) | 78.8% | 63.2% | 72.3% | 51.9% | |
+| Final model, leaked duplicates removed (1,546 images; [clean-test-final.json](clean-test-final.json)) | 78.8% | 63.2% | 72.3% | 51.9% | |
 | Final model, only the 23 leaked images | 89.2% | 77.0% | 87.8% | 75.0% | |
 
-| Class | Test boxes | Baseline AP50–95 | Final AP50–95 | 95% interval (final) | Change |
+| Class | Test boxes | Baseline AP50–95 (M4 Pro re-run) | Final AP50–95 | 95% interval (final) | Change |
 | --- | ---: | ---: | ---: | --- | ---: |
 | Biodegradable | 6,805 | 31.4% | 37.7% | 33.4% – 42.5% | +6.3 |
-| Cardboard | 703 | 42.9% | 52.8% | 45.2% – 62.0% | +9.9 |
+| Cardboard | 703 | 42.9% | 52.8% | 45.2% – 62.0% | +10.0 |
 | Glass | 1,165 | 55.0% | 60.1% | 49.6% – 72.0% | +5.1 |
-| Metal | 875 | 51.0% | 57.9% | 47.3% – 67.9% | +6.9 |
-| Paper | 658 | 49.2% | 55.8% | 46.4% – 65.9% | +6.6 |
+| Metal | 875 | 50.8% | 57.9% | 47.3% – 67.9% | +7.1 |
+| Paper | 658 | 49.3% | 55.8% | 46.4% – 65.9% | +6.5 |
 | Plastic | 892 | 37.7% | 46.5% | 39.5% – 55.8% | +8.8 |
 
 - **Every metric and every class improved.** Recall gained most (+8.5
@@ -85,6 +85,13 @@ for the training command):
 python assignment-1/task-2/evaluate_clean_test.py --device 0
 python assignment-1/task-2/bootstrap_test_ci.py --device 0
 ```
+
+Both models' per-class values come from the same Apple M4 Pro pipeline
+(`bootstrap_test_ci.py`), so the changes are computed before rounding; the
+baseline's original RTX 5050 values differ by at most 0.2 points (see below).
+The leak-free rows are in [clean-test-final.json](clean-test-final.json)
+(`evaluate_clean_test.py` writes `runs/clean-test/results.json`; this copy was
+made from that output).
 
 Both scripts now default to the final model; pass
 `--weights assignment-1/models/yolo26s-best.pt` for the baseline. The
