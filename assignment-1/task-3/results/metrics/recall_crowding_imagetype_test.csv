@@ -1,0 +1,9 @@
+objects_per_image,image_type,images,objects,found,recall
+1,white background,271,271,256,0.9446
+1,scene,492,492,461,0.937
+2-5,white background,192,549,448,0.816
+2-5,scene,255,708,540,0.7627
+6-20,white background,70,661,529,0.8003
+6-20,scene,172,1801,1130,0.6274
+>20,white background,6,272,156,0.5735
+>20,scene,111,6344,3065,0.4831

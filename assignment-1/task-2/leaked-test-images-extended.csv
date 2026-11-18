@@ -1,0 +1,30 @@
+group_id,test_image,copies_in_train,copies_in_val,visual_verdict,note
+5,biodegradable1526_jpg.rf.bc73c8bff90ea35f1dbe16867c8dcd0e.jpg,biodegradable1031_jpg.rf.bb6ca34f547600f0daa578c620332a40.jpg biodegradable1233_jpg.rf.16020684434938484f31bddd6d7a47e1.jpg biodegradable1451_jpg.rf.e12f9eb4f3a536f37d45687d39e2ccb8.jpg biodegradable1578_jpg.rf.c98d770ab80cd1e20a9d02ddffe0c30a.jpg,,confirmed,"same mouldy-produce stock photo, flips/crops"
+15,biodegradable1186_jpg.rf.b53b500a8a4f0814552287027dfc203b.jpg,biodegradable1083_jpg.rf.c71b21b2b299283b441b6bbad6ebdbf3.jpg,,confirmed,same strawberry photo flipped/cropped
+27,biodegradable2067_jpeg.rf.409a2cec368987ec3a37f0a24cd2330c.jpg,,biodegradable1423_jpg.rf.19e4b89da619e16b6edde01dd79a7f76.jpg,confirmed,"same tomato photo, shifted/watermark"
+29,biodegradable1582_jpg.rf.ae6406324b8ac0bac7f29b1770b3a984.jpg,biodegradable1430_jpg.rf.71f1d8131db49e455a36161006752c8d.jpg biodegradable1555_jpg.rf.969187969f95e6e2ba5ffd879d4366b9.jpg biodegradable1597_jpg.rf.79a446bb453e2a1fa0e331ce3bd9d655.jpg biodegradable2062_jpeg.rf.107e55d62941682a703e86897bf6a09c.jpg,,confirmed,"same tomato stock photo set, rotations (1582 test ~ 1597 train)"
+45,biodegradable169_jpg.rf.1185b9389a87066a2a4565e441ba2ed7.jpg,biodegradable546_jpg.rf.69d0785a9badbdea792d4517fb8d9067.jpg,,confirmed,"same apple photo, crop (watermark)"
+50,biodegradable1932_jpeg.rf.ea5b342c332a414517409071f2324ea5.jpg,biodegradable1836_jpeg.rf.94c5379a7546f9d687740e121cda6ddb.jpg,,confirmed,"same pear photo, zoomed crop"
+69,biodegradable668_jpg.rf.1e0b708774083f496e29a63e3b696b63.jpg,biodegradable2287_jpeg.rf.33acd263035f7d22f9b9996bdb803855.jpg,,confirmed,"same mouldy bread photo, shifted crop"
+87,paper2279_jpg.rf.769904fd52f03f159ebc816994ffaa2b.jpg,cardboard1269_jpg.rf.1fabacd8ffb89c4137e1da1183cb1042.jpg,,likely,"dark cardboard sheet, same scratch/edge, rotated crop; cardboard vs paper label"
+117,glass1426_jpg.rf.b0337e1a3ad23b9f8117b2c3a928ff23.jpg,glass1054_jpg.rf.3d7f89effed87a922bd431518590d69d.jpg,,confirmed,same Snapple bottle photo rotated/mirrored
+130,glass143_jpg.rf.eab0ecfe0dc440b248856f77c0119ef6.jpg,glass3037_jpg.rf.33a944164f8730a972f8fc9e5366561b.jpg,,confirmed,"same green bottles photo, watermark variants"
+134,glass276_jpg.rf.378e77ab397dba0dc994f2d6069b704d.jpg,glass152_jpg.rf.0e0ac58352db87f96620fac1971589de.jpg glass17_jpg.rf.f7e338f83a084c14e9224dd39dea0f67.jpg glass24_jpg.rf.ae1c44968fc70ed08f261302906bf05d.jpg glass285_jpg.rf.83b504d058e41b7b28f63be504022be5.jpg glass913_jpg.rf.2a946cf6ebbdf9e1aff3d67f5e6d9406.jpg,glass275_jpg.rf.4178bb092d79054f8365b5b691219098.jpg,likely,7-image chain: green set (train) and brown set; test glass276 ~ val glass275 rotated; chain may over-merge (285/913 look like other photos)
+146,glass2373_jpg.rf.62a396ccf63cf70fe3592e4f4f28af87.jpg,glass2243_jpg.rf.32fa3f38791daac9d6564f9f1711a3d0.jpg,glass1982_jpg.rf.6479a7d50fe64af59984469acb4fca71.jpg,session,"same bottle-cap-from-above series, different frames; not same image"
+156,glass2901_jpg.rf.fedd8a8ea6eff50e0f4bcf4c74d2ef87.jpg,glass2861_jpg.rf.bb4a2f23a36f129c1a717a4b4327c5b4.jpg,,confirmed,"same green bottle on tile, rotated 90 deg"
+176,metal173_jpg.rf.ff1491c36e5467144b3d7db6d65a476e.jpg,metal717_jpg.rf.f8cbc27c7aa7991e1ebdce7dd7f93300.jpg,,likely,"same four crushed cans, rotated 90 deg"
+191,metal708_jpg.rf.fab11a793baab3e9338a198db3b25198.jpg,metal764_jpg.rf.04ebfb22cb7cfa049bc786652823dc22.jpg metal846_jpg.rf.a04f221194905e535a6bfbba6b87622a.jpg,,confirmed,"same cola/lemon can render, hue-shifted and rotated; review.csv wrongly labelled pairs 56/235 different_images"
+200,paper993_jpg.rf.e2e912d1f5f801528ae4f8ae945428c6.jpg,paper1018_jpg.rf.dee435577c07beb0077fbe33d4bccf04.jpg,,confirmed,"same cups photo, red to yellow recolour"
+241,paper1759_jpeg.rf.d058f79a82f13417421ff8c42b9e288b.jpg,paper239_jpeg.rf.b4f5f55bda6d81746f7c08042df0861a.jpg,,uncertain,"crumpled white paper texture, may be crops of one sheet"
+265,paper927_jpg.rf.7e7d54368797a8c87ab79e25af7f3f98.jpg,paper951_jpg.rf.569e08f2ce4b520a640f503d1ae228c2.jpg,,likely,"same white cup, rotated 90 deg"
+270,plastic1111_jpg.rf.dfbeb48d1dae5add6018629e219ce042.jpg,plastic1069_jpg.rf.02a223574e0eab4855527b65142c9070.jpg,,confirmed,"same alamy crumpled bottle, mirrored/rotated"
+272,plastic109_jpg.rf.478adffb9784f865c27639eae5980abc.jpg,plastic116_jpg.rf.90851b9e40885f6af5be0bb653b6aefe.jpg,,confirmed,"same shutterstock bottles, mirrored"
+281,plastic716_jpg.rf.c0eaaca83d92cea6a25a4a098842375c.jpg,,plastic173_jpg.rf.bcdde112397eddf4497054efb702999b.jpg,uncertain,"pile of plastic bottles, similar scene, different framing"
+293,plastic3_jpg.rf.a41481691e4b5741e67c16486651f5f8.jpg,plastic329_jpg.rf.2d0823842b3ac6f89543f5c44d34f613.jpg plastic677_jpg.rf.c72e8c96e1440d803ce13ccf4653e5a3.jpg,,session,"same container, 3 different shots/zoom; same physical object"
+300,plastic581_jpg.rf.d50c4d0865e9c91c5506d49d2c6b9970.jpg,plastic886_jpg.rf.c403e8f79580bd882eb58208d93bedb9.jpg,,likely,"same milk bottle, vertical flip + zoom"
+orient,cardboard1662_jpg.rf.c8dd5a28f8d5adc25c504caf38bfdebe.jpg,cardboard1337_jpg.rf.c8009a774c19125f0ce3e71d5c64d469.jpg,,likely,"same box photo, different print (8-orientation search)"
+orient,cardboard221_jpg.rf.4cabfa678b37bc98f730e1e54db057f1.jpg,,cardboard305_jpg.rf.ce2e4dda6a831e865bf6bb8ff0200ce9.jpg,likely,same cardboard texture stock photo (8-orientation search)
+orient,glass2237_jpg.rf.0f003fff9285b739b732dace084729f2.jpg,glass2195_jpg.rf.bcf412caff6315acf6b8c62cf26f3c9e.jpg,,likely,"same bottle and pose, label added (8-orientation search)"
+orient,glass437_jpg.rf.6a1b7338bb23eba6d2495c43f0480308.jpg,glass3049_jpg.rf.55433b5fd2d6b0eae1cf9c6eb9921b17.jpg,,likely,"same bottle mock-up, recoloured (8-orientation search)"
+orient,metal1161_jpg.rf.c024a7ae0358df335a17d6722aab0d00.jpg,metal1226_jpg.rf.8c117190a7c995850b4db568aa01acc8.jpg,,likely,"same can mock-up, recoloured (8-orientation search)"
+orient,metal691_jpg.rf.b8a2f3c8bf40bac07fb8171908214ea3.jpg,metal1042_jpg.rf.38a13f92dedc2b4fcf7d48cf90fb0013.jpg,,confirmed,"same crushed can, rotated (8-orientation search)"

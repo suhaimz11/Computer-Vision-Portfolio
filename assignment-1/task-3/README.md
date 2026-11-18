@@ -159,8 +159,46 @@ share of predictions that are correct.
 - **Image type matters less than it first appears.** Scenes look much harder
   (56% vs 79% recall), but they are also far more crowded. At the same
   crowding level the gap shrinks (single object: 94.5% vs 93.7%; more than 20
-  objects: 57.4% vs 48.3%), except for 6–20 objects (80.0% vs 62.7%), so
-  clutter explains most of the gap and the background part of it.
+  objects: 57.4% vs 48.3%, but only 6 white-background images), except for
+  6–20 objects (80.0% vs 62.7%), so clutter explains most of the gap and the
+  background part of it
+  ([table](results/metrics/recall_crowding_imagetype_test.csv), written by
+  `breakdowns.py`).
+
+**Recall by class and object size** ([class_size_recall.py](class_size_recall.py),
+[table](results/metrics/recall_class_size_test.csv)):
+
+| Class | Small: objects / recall | Medium: objects / recall | Large: objects / recall |
+| --- | ---: | ---: | ---: |
+| Biodegradable | 2,610 / 29.2% | 3,016 / 70.8% | 1,179 / 77.9% |
+| Cardboard | 18 / 0.0% | 200 / 27.5% | 485 / 73.2% |
+| Glass | 98 / 26.5% | 311 / 37.9% | 756 / 85.3% |
+| Metal | 104 / 40.4% | 317 / 58.4% | 454 / 89.7% |
+| Paper | 29 / 10.3% | 155 / 20.0% | 474 / 76.4% |
+| Plastic | 143 / 44.1% | 348 / 52.9% | 401 / 73.6% |
+
+- **The small-object problem is mostly a biodegradable problem:** 2,610 of
+  the 3,002 small test objects are biodegradable, and only 29% of them are
+  found.
+- **Cardboard, paper and glass fail already at medium size** (27.5%, 20.0% and
+  37.9%, against 71% for biodegradable and 53–58% for plastic and metal). These
+  are the classes whose training boxes are mostly large: in the training split,
+  72% of paper, 68% of cardboard and 63% of glass boxes are large, against 44–47%
+  for plastic and metal and 17% for biodegradable. A class seen mostly as one big
+  object is rarely learned at medium size. This points to more examples of
+  these classes at smaller scale (crowded scenes, or copy-paste style
+  augmentation) rather than to a higher resolution alone; it is a correlation
+  across six classes, not a tested cause. Small-object counts for cardboard (18)
+  and paper (29) are too low to interpret.
+
+  | Training boxes (7,325 images) | Small | Medium | Large |
+  | --- | ---: | ---: | ---: |
+  | Biodegradable | 35.3% | 47.8% | 16.9% |
+  | Cardboard | 4.0% | 28.2% | 67.9% |
+  | Glass | 11.9% | 25.6% | 62.5% |
+  | Metal | 15.1% | 38.1% | 46.8% |
+  | Paper | 5.7% | 22.2% | 72.1% |
+  | Plastic | 15.3% | 41.0% | 43.6% |
 
 Sizes use COCO area bins on the 416-pixel source images. An image counts as
 a white-background photo when at least 80% of a thin border strip is
@@ -263,5 +301,8 @@ this was not checked image by image.
   A short AdamW refinement did not beat the baseline (43.7% vs 44.2%
   validation mAP50-95), while batch 16 with stronger augmentation reached
   51.2%; that run had converged by epoch 50 of 60, so more epochs would not help.
+- **Data for cardboard, paper and glass at smaller scale:** these classes are found
+  in only 20–38% of medium-size cases; more crowded examples, or copy-paste style augmentation,
+  target this directly.
 - **Evaluation:** report AP (not only recall) separately for small and crowded
-  objects, and run a paired bootstrap of the baseline-to-final difference.
+  objects.

@@ -1,0 +1,89 @@
+{
+ "baseline": "yolo26s-best.pt",
+ "final": "yolo26s-strongaug-best.pt",
+ "test_images": 1569,
+ "resamples": 1000,
+ "seed": 42,
+ "difference_final_minus_baseline": {
+  "precision": {
+   "value": 0.0374,
+   "ci95": [
+    0.0091,
+    0.0642
+   ],
+   "share_of_resamples_above_0": 0.998
+  },
+  "recall": {
+   "value": 0.0845,
+   "ci95": [
+    0.0627,
+    0.1041
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "mAP50": {
+   "value": 0.1034,
+   "ci95": [
+    0.0837,
+    0.1208
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "mAP50-95": {
+   "value": 0.073,
+   "ci95": [
+    0.0598,
+    0.0853
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "AP50-95 biodegradable": {
+   "value": 0.063,
+   "ci95": [
+    0.0504,
+    0.0789
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "AP50-95 cardboard": {
+   "value": 0.0998,
+   "ci95": [
+    0.0659,
+    0.1339
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "AP50-95 glass": {
+   "value": 0.051,
+   "ci95": [
+    0.0255,
+    0.0745
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "AP50-95 metal": {
+   "value": 0.0713,
+   "ci95": [
+    0.0401,
+    0.1043
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "AP50-95 paper": {
+   "value": 0.065,
+   "ci95": [
+    0.0357,
+    0.0967
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "AP50-95 plastic": {
+   "value": 0.088,
+   "ci95": [
+    0.0569,
+    0.115
+   ],
+   "share_of_resamples_above_0": 1.0
+  }
+ }
+}
