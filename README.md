@@ -30,8 +30,7 @@ earlier runs and evaluation protocol.
 | 2 | 1. Loss and sampling | [Theoretical proposal](assignment-2/task-1/README.md) |
 | 2 | 2. Embedding analysis and use | [Retrieval, classification and evaluation proposal](assignment-2/task-2/README.md) |
 
-The [Assignment 1 presentation](presentation/Assignment-1.pptx) contains the current
-model results and eight minutes of speaker notes. Model hashes and baseline
+Model hashes and baseline
 checkpoints are documented in [models/README.md](assignment-1/models/README.md).
 Assignment 2 is theoretical and requires no trained embedding model.
 
@@ -51,7 +50,6 @@ assignment-1/
 assignment-2/
   task-1/          Metric learning loss and sampling proposal
   task-2/          Embedding analysis and application proposal
-presentation/      Assignment 1 slides and supporting artwork
 ```
 
 Shared Assignment 1 data preparation scripts stay at its root. Recorded results
