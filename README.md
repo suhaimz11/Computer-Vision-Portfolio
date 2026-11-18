@@ -39,7 +39,7 @@ Assignment 2 is theoretical and requires no trained embedding model.
 ```text
 assignment-1/
   task-1/          Dataset report, figures and augmentation analysis
-  task-2/          Training and evaluation scripts, logs and metrics
+  task-2/          Training and evaluation scripts; results/ holds logs and metrics
   task-3/          Error analysis scripts, figures and prediction examples
   data/            Split manifests, duplicate groups and cleaning records
   duplicates/      Staged duplicate detection pipeline
@@ -113,7 +113,7 @@ python assignment-1/train_detector.py --device 0 --batch 16 --workers 0 --mosaic
 Use `--device mps` for the recorded Apple GPU configuration. The launcher
 defaults remain the original baseline settings, so retain the flags above when
 repeating the final recipe. Recorded arguments and all 60 training epochs are in
-[strong-augmentation-run/](assignment-1/task-2/strong-augmentation-run/).
+[strong-augmentation-run/](assignment-1/task-2/results/strong-augmentation-run/).
 
 ## Contribution statement
 

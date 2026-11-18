@@ -11,7 +11,7 @@ rotation and vertical flips together. These results measure their combined
 effect. Individual effects require separate controlled experiments.
 
 The full final run and resolved arguments are in
-[strong-augmentation-run/](strong-augmentation-run/). The submitted checkpoint
+[strong-augmentation-run/](results/strong-augmentation-run/). The submitted checkpoint
 and hashes are listed in [models/README.md](../models/README.md).
 
 Test mAP50-95 is 51.8% on the full split and 51.9% after excluding all 29

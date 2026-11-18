@@ -61,10 +61,10 @@ def main():
     base = Path(__file__).resolve().parents[1]
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--images', type=Path, default=base / 'data/processed/images')
-    ap.add_argument('--known', type=Path, default=Path(__file__).with_name('leaked-test-images.csv'))
+    ap.add_argument('--known', type=Path, default=Path(__file__).parent / 'results' / 'leaked-test-images.csv')
     ap.add_argument('--max-bits', type=int, default=10)
     ap.add_argument('--min-ncc', type=float, default=0.90)
-    ap.add_argument('--out', type=Path, default=Path(__file__).with_name('orientation-duplicate-check.json'))
+    ap.add_argument('--out', type=Path, default=Path(__file__).parent / 'results' / 'orientation-duplicate-check.json')
     a = ap.parse_args()
 
     files = {s: sorted(p for p in (a.images / s).iterdir() if p.suffix.lower() in IMG_EXT)

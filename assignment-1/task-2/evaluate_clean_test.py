@@ -69,7 +69,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--weights', default=str(base / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--data', type=Path, default=base / 'data/processed')
-    ap.add_argument('--leaked', type=Path, default=Path(__file__).with_name('leaked-test-images-extended.csv'))
+    ap.add_argument('--leaked', type=Path, default=Path(__file__).parent / 'results' / 'leaked-test-images-extended.csv')
     ap.add_argument('--work', type=Path, default=base.parent / 'runs/clean-test')
     ap.add_argument('--device', default='0', help="'0' for CUDA, 'mps' for Apple GPU, 'cpu'")
     a = ap.parse_args()
