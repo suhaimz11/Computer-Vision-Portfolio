@@ -25,7 +25,7 @@ appear in each subset. There are 267 non-singleton duplicate groups (largest:
 five images), with no confirmed group crossing subsets. Duplicates found only by
 the wider team search are not grouped: 44 such groups cross subsets (23 test images have
 a copy in training or validation, 26 validation images a copy in training); their effect on the test score
-is reported in [Task 2](../task-2/README.md#test-score-without-leaked-duplicates). All 10,464 images are
+is reported in [Task 2](../task-2/README.md#test-score-without-leaked-duplicates-baseline). All 10,464 images are
 retained. The 74,073 valid boxes are preserved; only 17 zero-area rows are removed.
 
 `summary.json` records actual counts, class coverage, dependency version and

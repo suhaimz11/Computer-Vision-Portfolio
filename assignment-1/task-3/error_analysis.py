@@ -190,7 +190,7 @@ def main():
     output = assignment.parent / "runs/task3"
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--weights", default=str(assignment / "models/yolo26s-best.pt"))
+    ap.add_argument("--weights", default=str(assignment / "models/yolo26s-strongaug-best.pt"))
     ap.add_argument("--images", default=str(test_data / "images/test"))
     ap.add_argument("--labels", default=str(test_data / "labels/test"))
     ap.add_argument("--out", default=str(output / "predictions"))

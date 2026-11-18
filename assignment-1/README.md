@@ -5,7 +5,9 @@ The complete [Task 1 report](task-1/README.md) documents the analysis,
 cleaning, verified split/export and selected YOLO26s training pipeline.
 The reproducible split workflow verifies cleaned labels before assigning data.
 The 60-epoch baseline is complete. Best logged validation mAP50 is 62.35% and
-mAP50-95 is 44.20% (epoch 57). See the [training review](task-2/training-review.md)
+mAP50-95 is 44.20% (epoch 57). A second run with a stronger recipe (batch 16,
+mosaic, stronger augmentation) reached 72.6% and 51.2% (epoch 50) and is the
+final model (test mAP50-95 51.8%; [Task 2](task-2/README.md#final-model-stronger-training-recipe)). See the [training review](task-2/training-review.md)
 for the Task 1 assessment and runnable improvement experiments. The [held-out test results](task-2/README.md) and [visual error analysis](task-3/README.md) are available.
 
 ## Setup

@@ -41,7 +41,7 @@ def main():
     assignment = Path(__file__).resolve().parents[1]
     data = assignment / "data/processed"
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--weights", default=str(assignment / "models/yolo26s-best.pt"))
+    ap.add_argument("--weights", default=str(assignment / "models/yolo26s-strongaug-best.pt"))
     ap.add_argument("--images", default=str(data / "images/val"))
     ap.add_argument("--labels", default=str(data / "labels/val"))
     ap.add_argument("--out", default=str(Path(__file__).with_name("results") / "metrics/threshold_selection_val.csv"))
