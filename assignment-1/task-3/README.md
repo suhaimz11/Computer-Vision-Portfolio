@@ -162,6 +162,28 @@ share of predictions that are correct.
   objects: 57.4% vs 48.3%), except for 6–20 objects (80.0% vs 62.7%), so
   clutter explains most of the gap and the background part of it.
 
+**Recall by class and object size** ([class_size_recall.py](class_size_recall.py),
+[table](results/metrics/recall_class_size_test.csv)):
+
+| Class | Small: objects / recall | Medium: objects / recall | Large: objects / recall |
+| --- | ---: | ---: | ---: |
+| Biodegradable | 2,610 / 29.2% | 3,016 / 70.8% | 1,179 / 77.9% |
+| Cardboard | 18 / 0.0% | 200 / 27.5% | 485 / 73.2% |
+| Glass | 98 / 26.5% | 311 / 37.9% | 756 / 85.3% |
+| Metal | 104 / 40.4% | 317 / 58.4% | 454 / 89.7% |
+| Paper | 29 / 10.3% | 155 / 20.0% | 474 / 76.4% |
+| Plastic | 143 / 44.1% | 348 / 52.9% | 401 / 73.6% |
+
+- **The small-object problem is mostly a biodegradable problem:** 2,610 of
+  the 3,002 small test objects are biodegradable, and only 29% of them are
+  found.
+- **Cardboard and paper fail already at medium size** (27.5% and 20.0%, against
+  71% for biodegradable). Their training photos are mostly one large object, so
+  a cardboard box or paper sheet seen smaller, inside a pile, is rarely learned.
+  This points to more crowded examples of these classes (or copy-paste style
+  augmentation) rather than to a higher resolution alone. Small-object counts
+  for cardboard (18) and paper (29) are too low to interpret.
+
 Sizes use COCO area bins on the 416-pixel source images. An image counts as
 a white-background photo when at least 80% of a thin border strip is
 near-white. Computed on an Apple M4 Pro GPU, like all final-model numbers in
@@ -263,5 +285,8 @@ this was not checked image by image.
   A short AdamW refinement did not beat the baseline (43.7% vs 44.2%
   validation mAP50-95), while batch 16 with stronger augmentation reached
   51.2%; that run had converged by epoch 50 of 60, so more epochs would not help.
+- **Data for cardboard and paper in piles:** both classes are found in only 20–28% of
+  medium-size cases; more crowded examples, or copy-paste style augmentation,
+  target this directly.
 - **Evaluation:** report AP (not only recall) separately for small and crowded
-  objects, and run a paired bootstrap of the baseline-to-final difference.
+  objects.
