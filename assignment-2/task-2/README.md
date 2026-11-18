@@ -44,7 +44,7 @@ Eligible crops per class:
 | paper | 2,797 | 7.1% | 633 | 625 | 264 |
 | plastic | 3,626 | 9.2% | 764 | 770 | 215 |
 
-The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same split, run at 640 pixels with `max_det = 400` (`assignment-1/train_detector.py`). The final checkpoint (trained with the stronger recipe of Assignment 1, best of 60 epochs on validation) reaches, on the 1,569 test images and 11,098 test boxes, precision 78.6%, recall 63.1%, mAP50 72.3% and mAP50-95 51.8% (`assignment-1/task-2/README.md`). Its recall is lowest for biodegradable (57.1%) and cardboard (57.9%) and highest for metal (71.0%) and glass (69.2%).
+The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same split, run at 640 pixels with `max_det = 400` (`assignment-1/train_detector.py`). The final checkpoint (trained with the stronger recipe of Assignment 1, best of 60 epochs on validation) reaches, on the 1,569 test images and 11,098 test boxes, precision 78.6%, recall 63.1%, mAP50 72.3% and mAP50-95 51.8% (`assignment-1/task-2/README.md`). Its recall is lowest for biodegradable (57.1%) and cardboard (57.9%) and highest for metal (71.0%) and glass (69.2%) (`assignment-1/task-2/test-per-class-metrics.json`, written by `assignment-1/task-2/per_class_test_metrics.py`).
 
 ### 0.3 Three rules carried over from Task 1
 
