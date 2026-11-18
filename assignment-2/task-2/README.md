@@ -49,7 +49,7 @@ The detector of Assignment 1 is COCO-pretrained YOLO26s, fine-tuned on the same 
 ### 0.3 Three rules carried over from Task 1
 
 1. **Gallery and queries come from different splits.** The gallery is the 39,574 eligible training crops. Queries for tuning come from validation, queries for the final numbers from test. The embedding was trained on the gallery crops, so a training crop must never be used as a query.
-2. **No copy of a query may count as its match.** Our split keeps the 267 reviewed duplicate groups together, but Task 1 (section 4.4) found 23 test images whose copy is still in training or validation. Before evaluation the split is rebuilt from the union of both duplicate lists, or those test images are removed; otherwise a test crop can retrieve its own copy.
+2. **No copy of a query may count as its match.** Our split keeps the 267 reviewed duplicate groups together, but 29 test images still have a copy in training or validation: 23 found in Task 1 (section 4.4) and 6 more, rotated, mirrored or recoloured, found by the 8-orientation search of Assignment 1 (`assignment-1/task-2/leaked-test-images-extended.csv`). Before evaluation the split is rebuilt from the union of all three duplicate lists, or those test images are removed; otherwise a test crop can retrieve its own copy. Mirrored and recoloured copies matter most here, because an embedding trained with flips and colour jitter (Task 1, section 4.6) is built to match them.
 3. **Within one split, a crop's own image and duplicate group are excluded.** Whenever crops are compared with crops of the same split (the measurements in section 3.3, NMI and silhouette in section 4.2, and the same-image check in section 4.6), crops from the query's own image and its duplicate group are removed from the candidates. This is not a detail: 89% of the eligible test crops (7,435 of 8,353) have another crop of the same class in the same photo, so without this rule "same class" would mostly mean "same photo".
 
 ---
@@ -223,7 +223,7 @@ Every metric is reported per class and also split by the properties that Task 1 
 | crop size (short side) | 24 to 32 px: 1,114 crops; 32 to 64 px: 2,981; at least 64 px: 4,258; below 24 px (not trained, reported separately): 2,745 | Task 1 excluded small crops from training and asked for results by size (section 5.2) |
 | border contact | 2,041 of the 8,353 eligible crops touch the border (within 2 pixels), including 313 of 625 paper and 214 of 678 cardboard crops | truncated objects are expected to be harder |
 | single-class versus mixed-class image | 152 of 1,569 test images hold several classes | crops from mixed scenes share background with other materials |
-| duplicate correction | with and without the 23 test images that have copies in training or validation (Task 1, section 4.4) | the difference shows how much leakage inflated the scores |
+| duplicate correction | with and without the 29 test images that have copies in training or validation (Task 1, section 4.4, and `assignment-1/task-2/leaked-test-images-extended.csv`) | the difference shows how much leakage inflated the scores |
 
 ### 4.5 Uncertainty of the numbers
 
@@ -238,7 +238,7 @@ Crops from one photo are not independent (same light, same background, often the
 | low Recall@1 for paper and cardboard only, with most errors between the two | the fuzzy label boundary noted in Task 1, not necessarily an embedding failure; check the thumbnails of the confused crops |
 | errors concentrated among glass, metal and plastic | the model separates by shape (bottle, can) more than by material; candidate for more training on these pairs (Task 1, section 4.5) |
 | scores fall sharply from at least 64 px to 24 to 32 px | the resolution limit of the crops; small objects need a larger input or a different approach |
-| scores drop clearly once the 23 leaked test images are removed | the earlier numbers were inflated by duplicates; only the corrected figure is valid |
+| scores drop clearly once the 29 leaked test images are removed | the earlier numbers were inflated by duplicates; only the corrected figure is valid |
 | within-split retrieval much better without the same-image exclusion than with it | the model matches photos, not materials (rule 3 in section 0.3) |
 | little gain over the pretrained backbone | metric learning added little; revisit the sampling or the loss (Task 1, section 6.2) |
 | high accuracy after rejection but low coverage | the threshold is too strict, or many crops really are ambiguous; check which classes are rejected most |
@@ -250,7 +250,7 @@ Crops from one photo are not independent (same light, same background, often the
 - **Nothing is trained.** The methods and their interpretation are designed for the model of Task 1; no result is claimed. The numbers in this document describe our data and split (and the chance levels that follow from them), not the performance of a model.
 - **Labels as ground truth.** All metrics measure agreement with the labels. The class names are confirmed by the dataset's `data.yaml` (Task 1, section 1.1), but the boundary between paper and cardboard labels is fuzzy. A part of the measured "error" may be label error, which is why the inspection steps in sections 2.4 and 3 are part of the method.
 - **Closed set.** All six classes are seen in training. The "unknown" answer of section 2.3 is tuned on validation crops of the known classes only, so how well it rejects truly new materials can only be checked with examples of such materials, which the dataset does not contain.
-- **Remaining duplicates.** Duplicates that neither duplicate search found can still link test and training images and make all scores slightly optimistic (Task 1, section 6.1).
+- **Remaining duplicates.** Duplicates that none of the three duplicate searches found can still link test and training images and make all scores slightly optimistic (Task 1, section 6.1); Assignment 1 treats the 29 known leaked test images as a lower bound.
 - **Detector dependence in use.** The quantitative evaluation uses ground-truth boxes. In operation, retrieval and assignment can only be as good as the detector's boxes: the final YOLO26s finds 63.1% of the test objects, so in an end-to-end system more than a third of the objects would never reach the embedding, and biodegradable and cardboard objects would be missed most often.
 
 ---
