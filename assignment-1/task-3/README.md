@@ -159,8 +159,11 @@ share of predictions that are correct.
 - **Image type matters less than it first appears.** Scenes look much harder
   (56% vs 79% recall), but they are also far more crowded. At the same
   crowding level the gap shrinks (single object: 94.5% vs 93.7%; more than 20
-  objects: 57.4% vs 48.3%), except for 6–20 objects (80.0% vs 62.7%), so
-  clutter explains most of the gap and the background part of it.
+  objects: 57.4% vs 48.3%, but only 6 white-background images), except for
+  6–20 objects (80.0% vs 62.7%), so clutter explains most of the gap and the
+  background part of it
+  ([table](results/metrics/recall_crowding_imagetype_test.csv), written by
+  `breakdowns.py`).
 
 **Recall by class and object size** ([class_size_recall.py](class_size_recall.py),
 [table](results/metrics/recall_class_size_test.csv)):
@@ -279,7 +282,10 @@ this was not checked image by image.
 - Results depend on annotation quality: only a sample of 30 images was visually
   reviewed, and incomplete or inconsistent labels appear as false alarms and
   misses.
--Possible duplicate leakage: the team's wider duplicate search (Assignment 2, Task 1, section 4.4) found 44 of its 307 duplicate groups still crossing the train/validation/test split; about 19 of them were judged real copies of a test image (about 1.2% of the 1,569 test images). The test scores may therefore be slightly optimistic. Duplicates found by neither search can also remain, and duplicates kept inside the same subset can give some sources extra weight.
+- Known source overlap remains. The wider audit found 44 crossing groups, and
+  an orientation search extended the affected test list from 23 to 29 images.
+  Excluding all 29 gives 51.9% mAP50-95 on 1,540 images, compared with 51.8%
+  on the full test split. Unknown copies and validation overlap can remain.
 - One model on one split. Confidence intervals were computed for the mAP
   values (Task 2), not for the counts in this report.
 - The figures show 9 selected examples, not a random sample.
@@ -297,7 +303,7 @@ this was not checked image by image.
 - **Training:** the training recipe mattered more than training length.
   A short AdamW refinement did not beat the baseline (43.7% vs 44.2%
   validation mAP50-95), while batch 16 with stronger augmentation reached
-  51.2%; that run had converged by epoch 50 of 60, so more epochs would not help.
+  51.2%; validation performance plateaued after epoch 50 within the 60-epoch run.
 - **Data for cardboard, paper and glass at smaller scale:** these classes are found
   in only 20–38% of medium-size cases; more crowded examples, or copy-paste style augmentation,
   target this directly.

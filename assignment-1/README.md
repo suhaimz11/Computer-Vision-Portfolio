@@ -12,7 +12,7 @@ for the Task 1 assessment and runnable improvement experiments. The [held-out te
 
 ## Setup
 
-Run from the repository root in PowerShell (Python 3.10+):
+Run from the repository root in PowerShell:
 
 ```powershell
 py -m venv .venv
@@ -83,7 +83,7 @@ Dataset images and feature caches are local; this specific preview set is versio
 
 Every script, in pipeline order, with what it reads and writes. Paths are
 relative to `assignment-1/`; run commands from the repository root (see the
-[reproduction table](../README.md#reproduce-assignment-1)).
+[reproduction table](../README.md#reproduce-from-the-repository-root)).
 
 | Stage | Script | Reads | Writes |
 | --- | --- | --- | --- |
@@ -95,9 +95,9 @@ relative to `assignment-1/`; run commands from the repository root (see the
 | Task 1 · cleaned labels | `rebuild_prepared_labels.py` | `GarbageDataset/labels/`, `data/prepared/removed_rows.txt` | `data/prepared/labels/` |
 | Task 1 · split | `prepare_split.py` | `GarbageDataset/`, `data/prepared/`, `review.csv` | `data/split/manifest.csv`, `summary.json` |
 | Task 1 · export | `export_yolo.py` | `data/split/`, `GarbageDataset/images/`, `data/prepared/labels/` | `data/processed/` with `data.yaml` |
-| Task 2 · train YOLO26s | `train_detector.py` | `data/processed/data.yaml`, `yolo26s.pt` | `runs/train/<name>/` (submitted copy: `models/yolo26s-best.pt`) |
+| Task 2 · train YOLO26s | `train_detector.py` | `data/processed/data.yaml`, `yolo26s.pt` | `runs/train/<name>/` (selected copy: `models/yolo26s-strongaug-best.pt`) |
 | Task 2 · train YOLOv5s | `yolov5/train.py` (+ `worker.py`) | `data/processed/`, YOLOv5 v7.0 code | `yolov5/runs/<run>/` (submitted copy: `models/yolov5s-best.pt`) |
-| Task 2 · leak-free test | `task-2/evaluate_clean_test.py` | `models/`, `data/processed/`, `task-2/leaked-test-images.csv` | `../runs/clean-test/results.json` |
+| Task 2 · full and filtered test | `task-2/evaluate_clean_test.py` | `models/`, `data/processed/`, `task-2/leaked-test-images-extended.csv` | `../runs/clean-test/results.json` |
 | Task 2 · confidence intervals | `task-2/bootstrap_test_ci.py` | `models/`, `data/processed/data.yaml` | `task-2/test-confidence-intervals.json` |
 | Task 3 · threshold | `task-3/select_threshold.py` | `models/`, validation split | `task-3/results/metrics/threshold_selection_val.csv` |
 | Task 3 · examples and errors | `task-3/error_analysis.py` | `models/`, test split | `../runs/task3/` (checked-in copy: `task-3/results/`) |
@@ -113,80 +113,17 @@ their scripts), `duplicates/passC/` (duplicate-search stages).
 Datasets, caches, old/generated review runs and local archives are excluded from Git.
 The current 364-pair preview set, code, supplied result CSVs and findings are versioned.
 
-## YOLO26s training baseline
+## Final training and evaluation
 
-The selected detector is COCO-pretrained `yolo26s.pt`, fine-tuned using the
-Ultralytics Python API. Confirm YOLO-family lecture coverage before submission.
-The fixed split and verified cleaned labels in `data/processed/` are used.
+The selected checkpoint is `models/yolo26s-strongaug-best.pt`. It uses batch 16,
+mosaic, stronger colour and scale augmentation, vertical flips and rotation.
+The [Task 1 report](task-1/README.md#training-only-augmentation) explains the choices,
+and [Task 2](task-2/README.md#final-model-stronger-training-recipe) records the run.
 
-From `assignment-1`, inspect the settings without training:
-
-```powershell
-python train_detector.py --dry-run
-```
-
-Install the pinned training packages with
-`python -m pip install -r requirements-training.txt` from `assignment-1`.
-The local Python 3.14 environment uses PyTorch 2.11.0+cu128,
-torchvision 0.26.0+cu128 and Ultralytics 8.4.208. CUDA availability, GPU matrix
-multiplication and torchvision CUDA NMS were verified on the RTX 5050 Laptop GPU.
-Then run a short training check:
-
-```powershell
-python train_detector.py --epochs 1 --fraction 0.02 --name yolo26s_smoke
-```
-
-For a CUDA illegal-instruction failure, use a fresh Python process and a short
-diagnostic run: `python train_detector.py --epochs 1 --fraction 0.02 --no-amp
---cuda-debug --workers 0 --name yolo26s_cuda_check`. This disables mixed
-precision and reports CUDA operations synchronously; it is a diagnostic, not
-proof that mixed precision caused the failure. Record any changed training
-settings with the experiment.
-
-Then inspect the augmented training batch plots before the baseline:
-
-```powershell
-python train_detector.py
-```
-
-Baseline: 60 epochs maximum, patience 20, seed 42, 640-pixel inputs, batch 4,
-GPU 0, AMP enabled and two Windows data workers. The RTX 5050 has 8 GB VRAM;
-reduce batch to 2 if crowded scenes exhaust memory. Training speed and peak
-memory have not yet been measured. Compare 416 using validation if needed;
-upscaling adds no source detail and its accuracy benefit must be measured.
-The loader handles resize/letterbox and RGB scaling to [0, 1].
-
-Use SGD with initial LR 0.01, momentum 0.937, weight decay 0.0005, three warmup
-epochs, cosine LR decay and final LR factor 0.01. These are baseline choices,
-not tuned results or a reproduction of the published YOLO26 training recipe.
-Ultralytics records resolved arguments and logs in `runs/train/`; record the
-exact package versions, GPU information and initialization weight hash with
-experimental results. Small batches may use gradient accumulation internally.
-
-Training-only augmentation: horizontal flips 0.5, translation 0.1, scaling 0.2,
-and HSV gains 0.015/0.3/0.2. Rotation, vertical flips, shear, perspective,
-mosaic, mixup and copy-paste are disabled for the initial baseline. A later
-check showed mosaic does not shrink objects in Ultralytics (see the
-[Task 1 augmentation check](task-1/README.md#training-only-augmentation)). Inspect the resulting boxes before
-full training. Validation and test use deterministic preprocessing.
-
-The detection cap is 400 for crowded images (up to 358 annotated objects).
-Use the saved best validation checkpoint according to the installed
-implementation's fitness; record that criterion with the pinned version.
-Use validation for all configuration and confidence-threshold choices.
-Report final test mAP50-95, mAP50, per-class AP, precision and recall with
-`max_det=400`. Test evaluation is separate from this training script. Review
-correct, missed and incorrect detections, including small and crowded objects.
-No oversampling initially; consider balancing only if validation supports it.
-Class names (ids 0 to 5: biodegradable, cardboard, glass, metal, paper, plastic) are
-confirmed by the dataset export's `data.yaml`.
-
-References: [YOLO26](https://docs.ultralytics.com/models/yolo26) and
-[training arguments](https://docs.ultralytics.com/modes/train).
-The CUDA environment and a short full-precision training/validation smoke run
-have been verified. After an intermittent CUDA illegal-instruction failure,
-the current full-data run uses `--no-amp --workers 0 --cuda-debug`; the user has
-reported successful completion of epoch 1. See the [held-out test results](task-2/README.md). See the Task 1 report for the diagnostic record.
+See the [root reproduction commands](../README.md#reproduce-from-the-repository-root)
+for setup, export, evaluation and error analysis, and the
+[final training command](../README.md#repeat-the-final-training-recipe) to train
+again. All commands there run from the repository root.
 
 ## Tests
 
@@ -194,18 +131,8 @@ reported successful completion of epoch 1. See the [held-out test results](task-
 python -m unittest discover -s assignment-1/tests -v
 ```
 
-## Next steps
+## Training history
 
-Run `python assignment-1/prepare_split.py` from the repository root to verify
-the supplied cleaned labels against originals and the removal log, then produce
-a group-aware 70/15/15 split with seed 42. Confirmed duplicate groups stay in
-one subset. The script refuses to overwrite existing output; use `--output`
-for a fresh destination. See [split outputs and training setup](data/split-README.md).
-
-Run `python assignment-1/export_yolo.py` from the repository root to copy the
-fixed split with cleaned labels into `data/processed/` and generate `data.yaml`.
-Every copied image and label is checked against its source. Existing output
-folders are refused. See the split documentation linked above for details.
-
-All of these steps are done; see the [reproduction table](../README.md#reproduce-assignment-1)
-for the complete order of commands.
+The [training history](task-2/training-review.md) records the original baseline,
+the AdamW refinement and the selected stronger recipe. Earlier checkpoints are
+retained for reproducibility in [models/](models/README.md).

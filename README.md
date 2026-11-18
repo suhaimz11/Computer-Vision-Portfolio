@@ -1,78 +1,121 @@
 # Computer Vision Portfolio
 
-The [portfolio brief](WS2026_ComputerVision_Portfolio-1.pdf) defines five tasks across two assignments.
+Object detection and theoretical deep metric learning for automated waste sorting.
+The [assignment brief](WS2026_ComputerVision_Portfolio-1.pdf) defines the five tasks.
 
-## Assignment 1 · Waste object detection
+## Submitted model and results
 
-| Task | Deliverable | Implementation and evidence |
+The selected detector is COCO-pretrained YOLO26s fine-tuned with the stronger
+training recipe. The checkpoint is
+[assignment-1/models/yolo26s-strongaug-best.pt](assignment-1/models/yolo26s-strongaug-best.pt).
+Validation selected epoch 50 of 60 at 51.2% mAP50-95.
+
+| Test subset | Images | Precision | Recall | mAP50 | mAP50-95 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Full test | 1,569 | 78.6% | 63.1% | 72.3% | 51.8% |
+| Excluding all 29 flagged source copies | 1,540 | 78.8% | 63.2% | 72.2% | 51.9% |
+
+The split retains known source overlap, including validation images with training
+copies. The filtered result is a sensitivity analysis without retraining.
+[Task 2](assignment-1/task-2/README.md) records the exclusions, uncertainty estimates,
+earlier runs and evaluation protocol.
+
+## Tasks and submission files
+
+| Assignment | Task | Deliverable |
 | --- | --- | --- |
-| 1 · Dataset analysis and pipeline | [Dataset and pipeline report](assignment-1/task-1/README.md) | [Audit, duplicate review, split and export instructions](assignment-1/README.md#dataset-audit) |
-| 2 · Training and evaluation | [Held-out results](assignment-1/task-2/README.md) | [YOLOv5s training](assignment-1/yolov5/README.md), [YOLO26s training](assignment-1/README.md#yolo26s-training-baseline), and evaluator logs in Task 2 |
-| 3 · Visualization and error analysis | [Report with nine annotated examples](assignment-1/task-3/README.md) | [Analysis script](assignment-1/task-3/error_analysis.py) and [metrics](assignment-1/task-3/results/metrics/) |
+| 1 | 1. Dataset analysis and training pipeline | [Report and implementation links](assignment-1/task-1/README.md) |
+| 1 | 2. Training and evaluation | [Metrics, training log and interpretation](assignment-1/task-2/README.md) |
+| 1 | 3. Visualization and error analysis | [Nine annotated examples and error analysis](assignment-1/task-3/README.md) |
+| 2 | 1. Loss and sampling | [Theoretical proposal](assignment-2/task-1/README.md) |
+| 2 | 2. Embedding analysis and use | [Retrieval, classification and evaluation proposal](assignment-2/task-2/README.md) |
 
-The adopted detector is **YOLO26s trained with the stronger augmentation recipe**, saved as `assignment-1/models/yolo26s-strongaug-best.pt`. Validation selected epoch 50 of 60, with mAP50–95 51.2%. The full test split gives **51.8% mAP50–95**. Excluding all 29 affected test images identified by the duplicate audits gives **51.9%** on 1,540 images. Task 3 uses this checkpoint and its regenerated predictions. See the [Task 2 report](assignment-1/task-2/README.md) for results and the earlier runs.
+The [Assignment 1 presentation](presentation/Assignment-1.pptx) contains the current
+model results and eight minutes of speaker notes. Model hashes and baseline
+checkpoints are documented in [models/README.md](assignment-1/models/README.md).
+Assignment 2 is theoretical and requires no trained embedding model.
 
-### Run Task 3 locally
+## Project structure
 
-With the virtual environment active, run this from the repository root.
-
-```powershell
-python .\assignment-1\task-3\error_analysis.py
+```text
+assignment-1/
+  task-1/          Dataset report, figures and augmentation analysis
+  task-2/          Training and evaluation scripts, logs and metrics
+  task-3/          Error analysis scripts, figures and prediction examples
+  data/            Split manifests, duplicate groups and cleaning records
+  duplicates/      Staged duplicate detection pipeline
+  models/          Submitted checkpoints and provenance
+  reports/         Dataset audit and completed review evidence
+  tests/           Pipeline regression tests
+  yolov5/          Baseline training launcher and configuration
+assignment-2/
+  task-1/          Metric learning loss and sampling proposal
+  task-2/          Embedding analysis and application proposal
+presentation/      Assignment 1 slides and supporting artwork
 ```
 
-The script uses the prepared test split and the final YOLO26s checkpoint by default.
-It writes examples and metrics to `runs/task3/`. Add `--device cpu` to run
-without CUDA. See the [Task 3 README](assignment-1/task-3/README.md) for
-the checkpoint path.
+Shared Assignment 1 data preparation scripts stay at its root. Recorded results
+and review evidence are versioned; source datasets, environments, caches and
+new experiment runs stay local. Task reports link to their supporting artifacts.
 
-## Assignment 2 · Deep metric learning
+## Setup
 
-1. [Loss function and sampling strategy](assignment-2/task-1/README.md)
-2. [Analysis and use of the learned embedding space](assignment-2/task-2/README.md)
+The dataset and virtual environment stay local. Download the course dataset from
+[the course share](https://cloud.fiw.fhws.de/s/P9BGwMj7oAZrQ2R) and place its YOLO
+images and labels in `assignment-1/GarbageDataset/images/` and
+`assignment-1/GarbageDataset/labels/`.
 
-Both tasks are theoretical.
+Create an environment from the repository root and install the pinned Windows
+CUDA dependencies.
 
-## Reproduce Assignment 1
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
 
-Every command runs from the repository root (PowerShell shown; on macOS or
-Linux use `source .venv/bin/activate` and forward slashes). Steps 1 to 4 need
-no GPU; step 5 needs a GPU (CUDA, or `--device mps` on Apple silicon); scripts
-default to `--device 0`, so pass `--device mps` or `--device cpu` without CUDA; steps 6 and 7 run on CPU with
-`device=cpu` / `--device cpu`, only slower.
+The recorded Windows environment used Python 3.14.4 and CUDA 12.8. The final
+training run used an Apple M4 Pro GPU with the same Ultralytics 8.4.208 release.
+For another platform, install the matching PyTorch build first, then the audit
+requirements and `ultralytics==8.4.208`. The saved checkpoint runs on CUDA,
+MPS or CPU. Use `--device mps` for Apple silicon or `--device cpu` without a GPU.
+
+## Reproduce from the repository root
 
 | Step | Command | Output |
 | --- | --- | --- |
-| 0. Environment (once) | `py -m venv .venv`, `.\.venv\Scripts\Activate.ps1`, `python -m pip install -r requirements.txt` | Python 3.14.4, PyTorch 2.11.0+cu128, Ultralytics 8.4.208 |
-| 1. Dataset | Put the course's Garbage Detection Dataset (YOLO format) in `assignment-1/GarbageDataset/images/` and `assignment-1/GarbageDataset/labels/` | 10,464 images, 416 x 416 |
-| 2. Tests and audit | `python -m unittest discover -s assignment-1/tests -v`, then `python assignment-1/audit_dataset.py` | `assignment-1/reports/audit.json` |
-| 3. Cleaned labels | `python assignment-1/rebuild_prepared_labels.py` | `assignment-1/data/prepared/labels/`: the originals minus the 17 zero-area rows in `removed_rows.txt` |
-| 3b. Check the split | `python assignment-1/prepare_split.py --output assignment-1/data/split-check` | Same rows as the committed `assignment-1/data/split/manifest.csv` (seed 42); only line endings may differ |
-| 4. Export for YOLO | `python assignment-1/export_yolo.py` | `assignment-1/data/processed/` with `data.yaml` (train / val / test) |
-| 5. Train (optional) | Download `yolo26s.pt` into `assignment-1/`, then `cd assignment-1`. Baseline: `python train_detector.py`. Final model: `python train_detector.py --device mps --batch 16 --workers 0 --mosaic 1.0 --close-mosaic 10 --scale 0.5 --flipud 0.5 --degrees 10 --hsv-s 0.7 --hsv-v 0.4 --name yolo26s_strongaug` (use `--device 0` on CUDA) | `assignment-1/runs/train/yolo26s_baseline/`, `assignment-1/runs/train/yolo26s_strongaug/` |
-| 6. Test evaluation (Task 2) | `yolo detect val model=assignment-1/models/yolo26s-strongaug-best.pt data=assignment-1/data/processed/data.yaml split=test imgsz=640 max_det=400` | Test precision, recall, mAP50, mAP50-95 and per-class AP |
-| 7. Error analysis (Task 3) | `python assignment-1/task-3/error_analysis.py` | `runs/task3/` with example images and metrics |
+| Tests | `python -m unittest discover -s assignment-1/tests -v` | Local regression checks |
+| Dataset audit | `python assignment-1/audit_dataset.py` | `assignment-1/reports/audit.json` |
+| Clean labels | `python assignment-1/rebuild_prepared_labels.py` | Verified cleaned label copies |
+| Verify the recorded split | `python assignment-1/prepare_split.py --output assignment-1/data/split-check` | Fresh split for comparison with the committed manifest |
+| Export | `python assignment-1/export_yolo.py` | `assignment-1/data/processed/` |
+| Full and filtered test metrics | `python assignment-1/task-2/evaluate_clean_test.py --device 0` | `runs/clean-test/results.json` |
+| Detection examples | `python assignment-1/task-3/error_analysis.py` | `runs/task3/predictions/` and `runs/task3/metrics/` |
 
-Skip step 5 to reproduce the reported results with the submitted checkpoint.
-Step 6 should print test mAP50 72.3% and mAP50-95 51.8% for the final model
-(44.5% with `models/yolo26s-best.pt`, the baseline; see
-[Task 2](assignment-1/task-2/README.md)); small differences can come from a
-different GPU or PyTorch build. The YOLOv5s baseline is trained and validated
-with its own launcher, described in [yolov5/README.md](assignment-1/yolov5/README.md).
+Cleaning, splitting and export protect existing outputs. Reuse the already
+prepared data on subsequent evaluations. The evaluator defaults to the selected
+checkpoint and the extended 29-image exclusion list. Pass `--leaked` to
+reproduce an earlier exclusion list.
 
-Without CUDA, install PyTorch for your platform from https://pytorch.org first,
-then `python -m pip install -r assignment-1/requirements-audit.txt ultralytics==8.4.208`.
+Task 3 uses confidence 0.25, selected on validation, and IoU 0.5 matching.
+Green marks dataset annotations, blue correct predictions, yellow missed
+annotations and red wrong-class predictions. These fixed-threshold counts use
+a different matching and operating point from the standard evaluator metrics.
 
-## Local setup and submission
+## Repeat the final training recipe
 
-To reproduce the filtered result on 1,540 images, run the evaluator with the extended exclusion list and a separate output folder.
+Training is optional when evaluating the submitted checkpoint. Download the
+COCO-pretrained `yolo26s.pt` into `assignment-1/`, then run the following from
+the repository root on a GPU with sufficient memory for batch 16.
 
 ```powershell
-python assignment-1/task-2/evaluate_clean_test.py --device 0 --leaked assignment-1/task-2/leaked-test-images-extended.csv --work runs/clean-test-extended
+python assignment-1/train_detector.py --device 0 --batch 16 --workers 0 --mosaic 1.0 --close-mosaic 10 --scale 0.5 --flipud 0.5 --degrees 10 --hsv-s 0.7 --hsv-v 0.4 --name yolo26s_strongaug
 ```
 
-The trained checkpoints are in [`assignment-1/models/`](assignment-1/models/README.md) (final model: YOLO26s). The dataset and virtual environment are stored locally. See the [Assignment 1 setup](assignment-1/README.md#setup) for dataset placement and dependencies. Run the local tests from the repository root with `python -m unittest discover -s assignment-1/tests -v`.
-
-The submission also requires a short presentation covering both assignments.
+Use `--device mps` for the recorded Apple GPU configuration. The launcher
+defaults remain the original baseline settings, so retain the flags above when
+repeating the final recipe. Recorded arguments and all 60 training epochs are in
+[strong-augmentation-run/](assignment-1/task-2/strong-augmentation-run/).
 
 ## Contribution statement
 

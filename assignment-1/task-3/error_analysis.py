@@ -157,7 +157,6 @@ def run(predictions, labels_dir, out_dir, metrics_dir, k=3, iou_thr=0.5):
         for (t, p), n in pairs.most_common():
             w.writerow([CLASSES[t], CLASSES[p], n])
 
-    # example selection (readable images only: <= 20 objects)
     small = [x for x in per_img if 1 <= x[0]["n_gt"] <= 20]
     by_stem = {x[0]["stem"]: x for x in small}
     correct = [x[0] for x in small if x[0]["fn"] == 0 and x[0]["fp"] == 0 and x[0]["conf"] == 0]
@@ -174,13 +173,20 @@ def run(predictions, labels_dir, out_dir, metrics_dir, k=3, iou_thr=0.5):
 
     out_dir = Path(out_dir)
     for cat, recs in chosen.items():
-        (out_dir / cat).mkdir(parents=True, exist_ok=True)
+        case_dir = out_dir / cat
+        case_dir.mkdir(parents=True, exist_ok=True)
+        selected_names = {f"{r['stem']}.jpg" for r in recs}
+        for previous in case_dir.glob("*.jpg"):
+            if previous.name not in selected_names:
+                previous.unlink()
         for r in recs:
             _, gc, gb, gs, pc, pb, pcf, ps = by_stem[r["stem"]]
             title = (f"{cat.upper()}: {r['stem'][:40]} | GT={r['n_gt']} TP={r['tp']} "
                      f"wrong={r['conf']} FP={r['fp']} missed={r['fn']}")
-            cv2.imwrite(str(out_dir / cat / f"{r['stem']}.jpg"),
-                        draw(r["path"], gc, gb, gs, pc, pb, pcf, ps, title))
+            output_path = case_dir / f"{r['stem']}.jpg"
+            annotated = draw(r["path"], gc, gb, gs, pc, pb, pcf, ps, title)
+            if not cv2.imwrite(str(output_path), annotated):
+                raise OSError(f"Could not save annotated example: {output_path}")
     return records, chosen
 
 

@@ -24,7 +24,6 @@ def main():
     parser.add_argument('--patience', type=int, default=20)
     parser.add_argument('--mosaic', type=float, default=0.0)
     parser.add_argument('--close-mosaic', type=int, default=10)
-    # Augmentation; the defaults are the baseline used for the submitted model.
     parser.add_argument('--scale', type=float, default=0.2)
     parser.add_argument('--flipud', type=float, default=0.0)
     parser.add_argument('--degrees', type=float, default=0.0)
@@ -76,7 +75,6 @@ def main():
     print(f'PyTorch {torch.__version__}; CUDA runtime {torch.version.cuda}')
     model = YOLO(str(args.model.resolve()))
     model.train(**config)
-    # Test evaluation is a separate action after validation-based model selection.
 
 
 if __name__ == '__main__':

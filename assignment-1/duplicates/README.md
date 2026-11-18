@@ -1,4 +1,4 @@
-# Teammate's duplicate pipeline
+# Duplicate detection pipeline
 
 From assignment-1, with your environment activated:
 
@@ -37,7 +37,8 @@ search; verified3.csv is the loose search. These are scores, not final verdicts.
 preview_duplicates.py selects unique pairs with at least 15 inliers from the
 latest verified3.csv. Its first output goes in reports/duplicate-review/; reruns
 use numbered folders and preserve existing decisions. The committed review has
-364 candidate pairs and previews, with decisions pending.
+364 candidate pairs and previews. The completed review records 341 same-source
+pairs and 23 different-image pairs.
 
 _paths.py uses supplied v3 groups/unsure lists only for status labels. The
 historical reference files were not supplied; status counts therefore differ

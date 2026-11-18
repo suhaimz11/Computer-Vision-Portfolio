@@ -1,13 +1,13 @@
-"""Evaluate a checkpoint on the test split with and without the 23 leaked test images.
+"""Evaluate a checkpoint before and after excluding flagged source copies.
 
-The 23 images listed in leaked-test-images.csv have a duplicate (flipped, rotated,
-cropped or recoloured copy) in training or validation according to the union of
-both duplicate searches. This script links the full, clean and leaked subsets of
-data/processed/ into a scratch folder and runs the Ultralytics evaluator on each.
+The default exclusion list contains 29 test images identified by the duplicate
+audits. Pass --leaked to reproduce another list. Subset files are rebuilt in
+the output directory without changing source images or labels.
 """
 import argparse
 import csv
 import json
+import shutil
 from pathlib import Path
 
 NAMES = ('biodegradable', 'cardboard', 'glass', 'metal', 'paper', 'plastic')
@@ -19,19 +19,45 @@ def count_boxes(subset):
 
 
 def link_subset(source, target, keep):
-    for kind in ('images', 'labels'):
-        (target / kind / 'test').mkdir(parents=True, exist_ok=True)
-    for image in sorted((source / 'images/test').iterdir()):
-        if not keep(image.name):
-            continue
+    source = Path(source).resolve()
+    target = Path(target).resolve()
+    if target.is_relative_to(source) or source.is_relative_to(target):
+        raise ValueError("Source and output dataset directories must be separate")
+
+    images = [image for image in sorted((source / 'images/test').iterdir())
+              if image.is_file() and keep(image.name)]
+    expected = {
+        'images': {image.name for image in images},
+        'labels': {image.stem + '.txt' for image in images},
+    }
+    for image in images:
+        if not (source / 'labels/test' / (image.stem + '.txt')).is_file():
+            raise FileNotFoundError(f"Missing label for {image.name}")
+
+    for kind, names in expected.items():
+        folder = target / kind / 'test'
+        if not folder.resolve().is_relative_to(target):
+            raise ValueError("Output dataset folders must stay inside the target")
+        folder.mkdir(parents=True, exist_ok=True)
+        for old in folder.iterdir():
+            if (old.is_file() or old.is_symlink()) and old.name not in names:
+                old.unlink()
+
+    for image in images:
         label = source / 'labels/test' / (image.stem + '.txt')
         for src, dst in ((image, target / 'images/test' / image.name),
                          (label, target / 'labels/test' / label.name)):
-            if not dst.exists():
-                dst.symlink_to(src.resolve())
-    # Ultralytics requires train and val keys; only the test split is evaluated.
-    # Ultralytics requires train and val keys; only the test split is evaluated.
-    yaml = (f'path: {json.dumps(target.resolve().as_posix())}\n'
+            if dst.exists() and dst.samefile(src):
+                continue
+            if dst.exists() or dst.is_symlink():
+                dst.unlink()
+            try:
+                dst.hardlink_to(src)
+            except OSError:
+                shutil.copy2(src, dst)
+
+    # Ultralytics requires train and val keys when evaluating the test split.
+    yaml = (f'path: {json.dumps(target.as_posix())}\n'
             'train: images/test\nval: images/test\ntest: images/test\nnames:\n'
             + ''.join(f'  {i}: {n}\n' for i, n in enumerate(NAMES)))
     (target / 'data.yaml').write_text(yaml, encoding='utf-8')
@@ -43,7 +69,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--weights', default=str(base / 'models/yolo26s-strongaug-best.pt'))
     ap.add_argument('--data', type=Path, default=base / 'data/processed')
-    ap.add_argument('--leaked', type=Path, default=Path(__file__).with_name('leaked-test-images.csv'))
+    ap.add_argument('--leaked', type=Path, default=Path(__file__).with_name('leaked-test-images-extended.csv'))
     ap.add_argument('--work', type=Path, default=base.parent / 'runs/clean-test')
     ap.add_argument('--device', default='0', help="'0' for CUDA, 'mps' for Apple GPU, 'cpu'")
     a = ap.parse_args()

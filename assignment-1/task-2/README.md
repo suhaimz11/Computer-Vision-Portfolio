@@ -41,7 +41,7 @@ rate schedule; the epoch in progress was repeated. The full log is in
 
 Validation mAP50–95 rose from 31.1% (epoch 10) to 39.3% (20), 45.7% (30),
 49.4% (40) and 51.2% (50), and stayed between 50.5% and 51.0% for epochs 51
-to 60: the model had converged, so longer training would not help.
+to 60: validation performance plateaued within the recorded training budget.
 
 **Test (1,569 images, 11,098 boxes), evaluated once after the decision:**
 
@@ -101,7 +101,7 @@ Reproduce from the repository root (see the [root README](../../README.md#reprod
 for the training command):
 
 ```powershell
-python assignment-1/task-2/evaluate_clean_test.py --device 0
+python assignment-1/task-2/evaluate_clean_test.py --device 0 --leaked assignment-1/task-2/leaked-test-images.csv
 python assignment-1/task-2/bootstrap_test_ci.py --device 0
 ```
 
@@ -200,9 +200,8 @@ postprocessing settings. Scores use the precision printed by the evaluators.
 | Plastic | 892 | 55.4% | 37.7% | 48.7% | 30.4% |
 
 Validation and test agree closely for YOLO26s (mAP50–95 44.2% and 44.5%,
-mAP50 62.35% and 61.9%). The model generalises to unseen images, and the
-test split is neither easier nor harder than the validation split it was
-selected on.
+mAP50 62.35% and 61.9%). The aggregate scores are similar across these two subsets. This alone does
+not establish equal difficulty or eliminate the source-overlap limitation.
 
 YOLO26s led by 8.0 percentage points in test mAP50–95 and achieved
 higher AP50–95 in all six classes. Glass was strongest for both models.
@@ -318,7 +317,7 @@ Reproduce from the repository root after exporting the split
 (`--device mps` on Apple silicon, `cpu` without a GPU):
 
 ```powershell
-python assignment-1/task-2/evaluate_clean_test.py --device 0 --weights assignment-1/models/yolo26s-best.pt
+python assignment-1/task-2/evaluate_clean_test.py --device 0 --weights assignment-1/models/yolo26s-best.pt --leaked assignment-1/task-2/leaked-test-images.csv
 ```
 
 The full-split row was recomputed on an Apple M4 Pro GPU (Python 3.14.7,
