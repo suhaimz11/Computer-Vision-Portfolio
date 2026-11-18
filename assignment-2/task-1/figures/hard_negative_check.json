@@ -1,0 +1,29 @@
+{
+  "pool_crops": 3000,
+  "batches": 400,
+  "K": 8,
+  "margin": 0.2,
+  "base_rate_below_24px": 0.0517,
+  "base_rate_suspect_label_image": 0.0187,
+  "hardest": {
+    "n": 134400,
+    "below_24px": 0.0788,
+    "below_16px": 0.0371,
+    "median_side_px": 144.0,
+    "suspect_label_image": 0.0282
+  },
+  "semi-hard": {
+    "n": 131774,
+    "below_24px": 0.0705,
+    "below_16px": 0.0365,
+    "median_side_px": 174.0,
+    "suspect_label_image": 0.0194
+  },
+  "random": {
+    "n": 134400,
+    "below_24px": 0.0527,
+    "below_16px": 0.0264,
+    "median_side_px": 169.0,
+    "suspect_label_image": 0.0191
+  }
+}
