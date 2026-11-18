@@ -64,14 +64,32 @@ to 60: the model had converged, so longer training would not help.
 - **Every metric and every class improved.** Recall gained most (+8.5
   points): the stronger recipe finds more objects, and precision rose as well
   (+3.7), so the gain is not a trade of false alarms for hits.
-- **The gain is larger than the sampling error.** The baseline's 44.5% lies
-  below the final model's interval (48.7% – 56.0%), and the final 51.8% lies
-  above the baseline's interval (41.6% – 48.8%). A paired bootstrap of the
-  difference was not run.
+- **The gain is far larger than the sampling error.** A paired bootstrap
+  ([paired_bootstrap.py](paired_bootstrap.py), 1,000 resamples of the same
+  test images for both models, [paired-bootstrap.json](paired-bootstrap.json))
+  puts the difference at **+7.3 points mAP50–95 (95% interval +6.0 to +8.5)**;
+  the final model was ahead in all 1,000 resamples. The two separate intervals
+  above nearly touch only because each also contains image-to-image variation,
+  which cancels when both models are scored on the same images.
+
+  | Difference final − baseline | Value | 95% interval |
+  | --- | ---: | --- |
+  | Precision | +3.7 | +0.9 to +6.4 |
+  | Recall | +8.5 | +6.3 to +10.4 |
+  | mAP50 | +10.3 | +8.4 to +12.1 |
+  | mAP50–95 | +7.3 | +6.0 to +8.5 |
+  | AP50–95 biodegradable / cardboard / glass | +6.3 / +10.0 / +5.1 | +5.0 to +7.9 / +6.6 to +13.4 / +2.5 to +7.4 |
+  | AP50–95 metal / paper / plastic | +7.1 / +6.5 / +8.8 | +4.0 to +10.4 / +3.6 to +9.7 / +5.7 to +11.5 |
+
+  Every class improved significantly.
 - **Validation and test agree** (51.2% and 51.8%), as for the baseline.
 - **The leaked duplicates still do not inflate the score:** removing them
   changes mAP50–95 from 51.8% to 51.9%, although the leaked images alone are
   much easier (75.0%).
+- **A third duplicate search, in all 8 orientations,** found 6 more test
+  images with a copy (see [below](#search-for-rotated-and-flipped-copies)).
+  Removing all 29 known leaked images still gives **51.9%**
+  ([clean-test-extended.json](clean-test-extended.json)).
 - **Biodegradable stays the weakest class**, its interval below every other
   class's point estimate: small objects in crowded piles remain the main
   limitation (Task 3).
@@ -97,6 +115,31 @@ Both scripts now default to the final model; pass
 `--weights assignment-1/models/yolo26s-best.pt` for the baseline. The
 baseline's intervals are kept in
 [test-confidence-intervals-baseline.json](test-confidence-intervals-baseline.json).
+
+## Search for rotated and flipped copies
+
+The two earlier duplicate searches compared images mostly in their stored
+orientation. [orientation_duplicate_check.py](orientation_duplicate_check.py)
+hashes every test image in all 8 orientations (4 rotations, each also
+mirrored) with a 64-bit perceptual hash, compares it with all 8,895 training
+and validation images (at most 10 differing bits), and keeps a pair only if
+the two images also correlate strongly in the matching orientation
+(normalised cross-correlation >= 0.90). Every new pair was then checked by eye.
+
+- 16 test images matched. 5 were already in the leaked list; 11 were new.
+- Of the 11 new ones, **6 are copies** (1 confirmed: the same crushed can,
+  rotated; 5 likely: recoloured can and bottle mock-ups, the same bottle with a
+  label added, the same box photo with a different print, the same cardboard
+  texture photo) and 5 were different bottles that only look alike on a white
+  background. The 6 are added in
+  [leaked-test-images-extended.csv](leaked-test-images-extended.csv) (29 images).
+- The hash missed 18 of the 23 known copies, which are cropped or recoloured;
+  each search catches a different kind of copy, so all three are needed.
+- Final model, test mAP50–95: full split 51.8%; without all 29 leaked images
+  (1,540 images) **51.9%**; on the 29 leaked images alone 70.1%. The leak does
+  not inflate the reported score.
+
+Raw matches are in [orientation-duplicate-check.json](orientation-duplicate-check.json).
 
 ## Baseline runs: YOLO26s and YOLOv5s
 
